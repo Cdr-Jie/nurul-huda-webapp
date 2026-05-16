@@ -41,7 +41,7 @@ type FilterType = 'all' | 'income' | 'expense';
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const TX_CATEGORIES = {
-  income:  ['Derma', 'Zakat', 'Sewaan', 'Sumbangan', 'Lain-lain'],
+  income:  ['Derma', 'Zakat', 'Sewaan', 'Sumbangan', 'Kutipan Jumaat', 'Lain-lain'],
   expense: ['Utiliti', 'Penyelenggaraan', 'Gaji', 'Peralatan', 'Program', 'Lain-lain'],
 };
 
