@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import EventCard from '../components/EventCard';
-import { supabase } from '../supabaseClient';
 import { Link } from 'react-router-dom';
 
 // ─── Type matching the DB schema ──────────────────────────────────────────────
@@ -58,19 +57,26 @@ const EventsSection: React.FC = () => {
     setLoading(true);
     setError(null);
 
-    const { data, error } = await supabase
-      .from('events')
-      .select('*')
-      .order('date', { ascending: true });
+      try {
+        // Fetch from the backend API endpoint
+        const apiUrl = import.meta.env.VITE_API_URL || `${window.location.origin}`;
+        const response = await fetch(`${apiUrl}/api/events`);
+        
+        if (!response.ok) {
+          setError('Acara sedang dimuat. Sila cuba lagi kemudian.');
+          setLoading(false);
+          return;
+        }
 
-    if (error) {
-      setError('Gagal memuatkan acara. Sila cuba lagi.');
-    } else {
-      setEvents(data ?? []);
-    }
-
-    setLoading(false);
-  };
+        const data = await response.json();
+        setEvents(data ?? []);
+      } catch (err) {
+        console.error('Error fetching events:', err);
+        setError('Gagal memuatkan acara. Sila cuba lagi.');
+      } finally {
+        setLoading(false);
+      }
+    };
 
     fetchEvents();
   }, []);

@@ -23,7 +23,7 @@ const Navbar = () => {
     { name: "Carta Organisasi", href: "/carta" },
     { name: "Sejarah Masjid", href: "/sejarah" },
     // Only add this if the user is logged in
-    ...(session.user ? [{ name: "Pengurusan", href: "/admin" }] : []),
+    ...(session?.user ? [{ name: "Pengurusan", href: "/admin" }] : []),
   ];
 
   const handleNavClick = () => {
@@ -59,7 +59,7 @@ const Navbar = () => {
               ))}
             </ul>
 
-            {session.user ? (
+            {session?.user ? (
               <button
                 onClick={handleLogout}
                 className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-full font-medium transition"
@@ -114,7 +114,7 @@ const Navbar = () => {
               ))}
 
               <li className="px-4 pt-2">
-                {session.user ? (
+                {session?.user ? (
                   <button
                     onClick={handleLogout}
                     className="w-full text-sm bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded font-medium transition"
