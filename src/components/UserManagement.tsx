@@ -31,8 +31,8 @@ const UserManagement = () => {
   // Only superadmin can manage users (pengguna resource)
   const hasPermission = !isSessionPending && (userRole === 'superadmin');
 
-  // For view-only access (admin + financeadmin can see but not edit)
-  const canViewOnly = !isSessionPending && ['admin', 'financeadmin'].includes(userRole);
+  // // For view-only access (admin + financeadmin can see but not edit)
+  // const canViewOnly = !isSessionPending && ['admin', 'financeadmin'].includes(userRole);
   // ── Debounce search ─────────────────────────────────────────────────────────
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(searchQuery), 500);
