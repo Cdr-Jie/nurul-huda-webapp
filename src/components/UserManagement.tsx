@@ -60,8 +60,24 @@ const UserManagement = () => {
           sortDirection: "desc",
         },
       });
+
       if (response.data) {
-        setUsers(response.data.users);
+        const authUsers = response.data.users;
+
+        // Fetch extra fields from Supabase for all returned users
+        const ids = authUsers.map(u => u.id);
+        const { data: profiles } = await supabase
+          .from('user')
+          .select('id, biro_id, position, phone')
+          .in('id', ids);
+
+        // Merge the two datasets
+        const merged = authUsers.map(u => {
+          const profile = profiles?.find(p => p.id === u.id);
+          return { ...u, ...profile };
+        });
+
+        setUsers(merged);
         setTotalUsers(response.data.total);
       }
     } catch (error) {
@@ -70,7 +86,6 @@ const UserManagement = () => {
       setIsLoading(false);
     }
   };
-
   useEffect(() => {
     if (!isSessionPending && hasPermission) fetchUsers();
   }, [isSessionPending, hasPermission, page, isSearching, pageSize]);
