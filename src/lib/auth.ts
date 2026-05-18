@@ -50,25 +50,4 @@ export const auth = betterAuth({
       adminRoles: ["admin", "financeadmin", "superadmin"]
     })
   ],
-
-    user: {
-    additionalFields: {
-      biro_id: {
-        type: 'string',
-        required: false,
-        nullable: true,
-      },
-      position: {
-        type: 'string',
-        required: false,
-        nullable: true,
-      },
-      phone: {
-        type: 'string',
-        required: false,
-        nullable: true,
-      },
-    },
-  },
-
 });
