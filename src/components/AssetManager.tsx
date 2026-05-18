@@ -424,20 +424,20 @@ const assetsWithCounts = await Promise.all(
     <div className="p-4 max-w-7xl mx-auto pb-20 text-left">
 
       {/* Back */}
-      <div className="w-full flex justify-start mb-2">
+      {/* <div className="w-full flex justify-start mb-2">
         <button onClick={() => window.history.back()}
           className="flex items-center text-sm text-gray-500 hover:text-blue-600 transition-colors group">
           <ChevronLeftIcon className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" />
           Kembali ke Menu Pengurusan
         </button>
-      </div>
+      </div> */}
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <div>
+        {/* <div>
           <h1 className="text-2xl font-bold text-gray-900">Pengurusan Aset</h1>
           <p className="text-gray-500 text-sm">Urus aset masjid yang dipinjamkan</p>
-        </div>
+        </div> */}
         <div className="flex gap-2 w-full sm:w-auto">
           <button onClick={exportToExcel}
             className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 font-semibold text-sm">

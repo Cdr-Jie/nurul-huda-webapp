@@ -169,24 +169,6 @@ const Navbar = () => {
                 </li>
               ))}
 
-              <li className="px-4 pt-2">
-                {session?.user ? (
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-sm bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded font-medium transition"
-                  >
-                    Log Keluar
-                  </button>
-                ) : (
-                  <Link
-                    to="/login"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="block w-full text-center text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded font-medium transition"
-                  >
-                    Log Masuk
-                  </Link>
-                )}
-              </li>
             </ul>
           </div>
         )}

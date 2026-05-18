@@ -12,6 +12,7 @@ import { ChevronLeftIcon } from '@heroicons/react/24/outline';
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type TxType = 'income' | 'expense';
+type PaymentMethod = 'qr' | 'cash';
 
 interface Transaction {
   id: string;
@@ -21,6 +22,7 @@ interface Transaction {
   description: string | null;
   date: string;
   created_at: string;
+  payment_method: PaymentMethod;
 }
 
 interface Tabung {
@@ -46,7 +48,7 @@ const TX_CATEGORIES = {
 };
 
 const EMPTY_TX: TxFormData = {
-  type: 'income', amount: 0, category: '', description: '', date: new Date().toISOString().split('T')[0],
+  type: 'income', amount: 0, category: '', description: '', date: new Date().toISOString().split('T')[0], payment_method: 'cash',
 };
 
 const EMPTY_TABUNG: TabungFormData = {
@@ -148,6 +150,8 @@ const FinanceManager = () => {
   const [txLoading, setTxLoading] = useState(true);
   const [txSearch, setTxSearch] = useState('');
   const [txFilter, setTxFilter] = useState<FilterType>('all');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | 'all'>('all');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
   // Tabung state
   const [tabungList, setTabungList] = useState<Tabung[]>([]);
@@ -186,6 +190,7 @@ const FinanceManager = () => {
         ...t,
         amount: Number(t.amount),
         date: t.date.slice(0, 10), // ensures "YYYY-MM-DD" only
+        payment_method: t.payment_method ?? 'cash', // default to cash if not set
       }));
       setTransactions(normalized);
     }
@@ -213,10 +218,20 @@ const FinanceManager = () => {
   const totalExpense = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
   const balance      = totalIncome - totalExpense;
 
+  const qrIncome  = transactions.filter(t => t.type === 'income' && t.payment_method === 'qr').reduce((s, t) => s + t.amount, 0);
+  const qrExpense = transactions.filter(t => t.type === 'expense' && t.payment_method === 'qr').reduce((s, t) => s + t.amount, 0);
+  const qrBalance = qrIncome - qrExpense;
+
+  const cashIncome  = transactions.filter(t => t.type === 'income' && t.payment_method === 'cash').reduce((s, t) => s + t.amount, 0);
+  const cashExpense = transactions.filter(t => t.type === 'expense' && t.payment_method === 'cash').reduce((s, t) => s + t.amount, 0);
+  const cashBalance = cashIncome - cashExpense;
+
   // ── Derived: filtered transactions ─────────────────────────────────────────
 
   const filteredTx = transactions.filter(tx => {
     const matchesType = txFilter === 'all' || tx.type === txFilter;
+    const matchesPayment = paymentMethod === 'all' || tx.payment_method === paymentMethod;
+    const matchesCategory = categoryFilter === 'all' || tx.category === categoryFilter;
     const q = txSearch.toLowerCase().trim();
     const matchesSearch = !q || (
       tx.category.toLowerCase().includes(q) ||
@@ -224,7 +239,7 @@ const FinanceManager = () => {
       formatDate(tx.date).toLowerCase().includes(q) ||
       tx.amount.toString().includes(q)
     );
-    return matchesType && matchesSearch;
+    return matchesType && matchesSearch && matchesPayment && matchesCategory;
   });
 
   // ── Transaction CRUD ────────────────────────────────────────────────────────
@@ -235,7 +250,7 @@ const FinanceManager = () => {
   };
 
   const openEditTx = (tx: Transaction) => {
-    setTxForm({ type: tx.type, amount: tx.amount, category: tx.category, description: tx.description ?? '', date: tx.date });
+    setTxForm({ type: tx.type, amount: tx.amount, category: tx.category, description: tx.description ?? '', date: tx.date, payment_method: tx.payment_method });
     setTxError(null); setTxModal({ open: true, editing: tx });
   };
 
@@ -300,6 +315,7 @@ const FinanceManager = () => {
   const exportToExcel = () => {
     const txRows = filteredTx.map(t => ({
       Tarikh: t.date, Jenis: t.type === 'income' ? 'Masuk' : 'Keluar',
+      'Kaedah Bayaran': t.payment_method === 'qr' ? 'QR' : 'Tunai',
       Kategori: t.category, Penerangan: t.description ?? '',
       Jumlah: t.amount,
     }));
@@ -355,6 +371,33 @@ const FinanceManager = () => {
           icon={<BanknotesIcon className={`w-6 h-6 ${balance >= 0 ? 'text-blue-600' : 'text-amber-600'}`} />} />
       </div>
 
+      {/* QR vs Cash Summary */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border border-purple-200 shadow-sm p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-bold text-purple-900">Transaksi QR</h3>
+            <div className="text-2xl">📱</div>
+          </div>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between"><span className="text-purple-700">Masuk:</span><span className="font-semibold text-green-600">{formatMoney(qrIncome)}</span></div>
+            <div className="flex justify-between"><span className="text-purple-700">Keluar:</span><span className="font-semibold text-red-500">{formatMoney(qrExpense)}</span></div>
+            <div className="border-t border-purple-200 pt-2 flex justify-between"><span className="text-purple-700 font-semibold">Baki:</span><span className={`font-bold ${qrBalance >= 0 ? 'text-green-600' : 'text-red-500'}`}>{formatMoney(qrBalance)}</span></div>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl border border-amber-200 shadow-sm p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-bold text-amber-900">Transaksi Tunai</h3>
+            <div className="text-2xl">💵</div>
+          </div>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between"><span className="text-amber-700">Masuk:</span><span className="font-semibold text-green-600">{formatMoney(cashIncome)}</span></div>
+            <div className="flex justify-between"><span className="text-amber-700">Keluar:</span><span className="font-semibold text-red-500">{formatMoney(cashExpense)}</span></div>
+            <div className="border-t border-amber-200 pt-2 flex justify-between"><span className="text-amber-700 font-semibold">Baki:</span><span className={`font-bold ${cashBalance >= 0 ? 'text-green-600' : 'text-red-500'}`}>{formatMoney(cashBalance)}</span></div>
+          </div>
+        </div>
+      </div>
+
       {/* Tabs */}
       <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-6 w-full sm:w-fit">
         {(['transactions', 'tabung', 'charts'] as ActiveTab[]).map(tab => (
@@ -387,7 +430,7 @@ const FinanceManager = () => {
             {/* Type filter */}
             <div className="flex gap-1 bg-gray-100 rounded-lg p-1 shrink-0">
               {(['all', 'income', 'expense'] as FilterType[]).map(f => (
-                <button key={f} onClick={() => setTxFilter(f)}
+                <button key={f} onClick={() => { setTxFilter(f); setCategoryFilter('all'); }}
                   className={`px-3 py-1.5 rounded-md text-xs font-semibold transition ${
                     txFilter === f ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700'
                   }`}>
@@ -395,6 +438,34 @@ const FinanceManager = () => {
                 </button>
               ))}
             </div>
+
+            {/* Payment Method filter */}
+            <div className="flex gap-1 bg-gray-100 rounded-lg p-1 shrink-0">
+              {(['all', 'qr', 'cash'] as (PaymentMethod | 'all')[]).map(m => (
+                <button key={m} onClick={() => setPaymentMethod(m)}
+                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition ${
+                    paymentMethod === m ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700'
+                  }`}>
+                  {m === 'all' ? 'Semua' : m === 'qr' ? '📱 QR' : '💵 Tunai'}
+                </button>
+              ))}
+            </div>
+
+            {/* Category filter dropdown */}
+            <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}
+              className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-xs font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 shrink-0">
+              <option value="all">Semua Kategori</option>
+              {txFilter === 'all' ? (
+                <>
+                  {TX_CATEGORIES.income.map(cat => <option key={`income-${cat}`} value={cat}>{cat} (Masuk)</option>)}
+                  {TX_CATEGORIES.expense.map(cat => <option key={`expense-${cat}`} value={cat}>{cat} (Keluar)</option>)}
+                </>
+              ) : (
+                TX_CATEGORIES[txFilter].map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))
+              )}
+            </select>
 
             <button onClick={openAddTx}
               className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold text-sm shrink-0">
@@ -423,7 +494,8 @@ const FinanceManager = () => {
                   <tr>
                     <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Penerangan</th>
                     <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Tarikh</th>
-                    <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Kategori</th>
+                    <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Kaedah</th>
+                    <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden lg:table-cell">Kategori</th>
                     <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide text-right">Jumlah</th>
                     <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide text-right">Tindakan</th>
                   </tr>
@@ -442,11 +514,21 @@ const FinanceManager = () => {
                             <p className="text-sm font-semibold text-gray-800">{tx.category}</p>
                             {tx.description && <p className="text-xs text-gray-500">{tx.description}</p>}
                             <p className="sm:hidden text-xs text-gray-400 mt-0.5">{formatDate(tx.date)}</p>
+                            <p className="md:hidden text-xs mt-1">
+                              <span className={`inline-block px-2 py-0.5 rounded text-white text-xs font-medium ${tx.payment_method === 'qr' ? 'bg-purple-600' : 'bg-amber-600'}`}>
+                                {tx.payment_method === 'qr' ? '📱 QR' : '💵 Tunai'}
+                              </span>
+                            </p>
                           </div>
                         </div>
                       </td>
                       <td className="p-4 text-sm text-gray-600 hidden sm:table-cell">{formatDate(tx.date)}</td>
                       <td className="p-4 hidden md:table-cell">
+                        <span className={`inline-block px-2 py-1 rounded text-white text-xs font-medium ${tx.payment_method === 'qr' ? 'bg-purple-600' : 'bg-amber-600'}`}>
+                          {tx.payment_method === 'qr' ? '📱 QR' : '💵 Tunai'}
+                        </span>
+                      </td>
+                      <td className="p-4 hidden lg:table-cell">
                         <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full font-medium">{tx.category}</span>
                       </td>
                       <td className="p-4 text-right">
@@ -533,6 +615,22 @@ const FinanceManager = () => {
                           : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
                       }`}>
                       {t === 'income' ? '↑ Masuk' : '↓ Keluar'}
+                    </button>
+                  ))}
+                </div>
+              </Field>
+
+              {/* Payment Method toggle */}
+              <Field label="Kaedah Bayaran" required>
+                <div className="flex gap-2">
+                  {(['qr', 'cash'] as PaymentMethod[]).map(m => (
+                    <button key={m} type="button" onClick={() => setTxForm(f => ({ ...f, payment_method: m }))}
+                      className={`flex-1 py-2 rounded-lg text-sm font-semibold border transition ${
+                        txForm.payment_method === m
+                          ? m === 'qr' ? 'bg-purple-600 text-white border-purple-600' : 'bg-amber-600 text-white border-amber-600'
+                          : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                      }`}>
+                      {m === 'qr' ? '📱 QR' : '💵 Tunai'}
                     </button>
                   ))}
                 </div>
