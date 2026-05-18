@@ -25,7 +25,7 @@ export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET,
   
   trustedOrigins: [
-    'https://nurul-huda-webapp-one.vercel.app',
+    'https://nurul-huda-webapp.vercel.app',
     'http://localhost:5173', // for local dev
   ],
 
