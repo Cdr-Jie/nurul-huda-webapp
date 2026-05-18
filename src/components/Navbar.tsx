@@ -64,17 +64,18 @@ const Navbar = () => {
     try {
       await authClient.signOut();
       setIsMenuOpen(false);
-      navigate('/');
+      navigate("/");
     } catch (error) {
-      console.error('Sign out error:', error);
+      console.error("Sign out error:", error);
     }
   };
 
-  const navItems: NavItem[] = [
-    { name: 'Home',             href: '/' },
-    { name: 'Carta Organisasi', href: '/carta' },
-    { name: 'Sejarah Masjid',   href: '/sejarah' },
-    ...(isLoggedIn ? [{ name: 'Pengurusan', href: '/admin' }] : []),
+  const navItems = [
+    { name: "Home", href: "/" },
+    { name: "Carta Organisasi", href: "/carta" },
+    { name: "Sejarah Masjid", href: "/sejarah" },
+    // Only add this if the user is logged in
+    ...(session?.user ? [{ name: "Pengurusan", href: "/admin" }] : []),
   ];
 
   return (
@@ -110,13 +111,21 @@ const Navbar = () => {
               ))}
             </ul>
 
-            {/* Desktop auth button — single source */}
-            <AuthActionButton
-              isMobile={false}
-              isPending={isPending}
-              isLoggedIn={isLoggedIn}
-              onLogout={handleLogout}
-            />
+            {session?.user ? (
+              <button
+                onClick={handleLogout}
+                className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-full font-medium transition"
+              >
+                Log Keluar
+              </button>
+            ) : (
+              <Link
+                to="/login"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full font-medium transition"
+              >
+                Log Masuk
+              </Link>
+            )}
           </div>
 
           {/* ── Mobile controls (hidden from md up) ── */}
@@ -164,6 +173,25 @@ const Navbar = () => {
                   </NavLink>
                 </li>
               ))}
+
+              <li className="px-4 pt-2">
+                {session?.user ? (
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-sm bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded font-medium transition"
+                  >
+                    Log Keluar
+                  </button>
+                ) : (
+                  <Link
+                    to="/login"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="block w-full text-center text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded font-medium transition"
+                  >
+                    Log Masuk
+                  </Link>
+                )}
+              </li>
             </ul>
           </div>
         )}

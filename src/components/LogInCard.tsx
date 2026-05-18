@@ -1,18 +1,14 @@
-// 1. Change the import to your supabase client
-import { supabase } from '../supabaseClient';
-import { Link, useNavigate } from "react-router-dom"; // Use useNavigate for better React flow
+import { Link, useNavigate } from "react-router-dom"; 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { passwordSchema } from "../lib/validation";
+import { authClient } from '../lib/auth-client';
 
-// import { 
-//   GlobeAltIcon, 
-// } from "@heroicons/react/24/outline";
 
 const loginSchema = z.object({
-  email: z.string().email("Invalid email address"), // Fixed: z.string().email()
+  email: z.email("Invalid email address"),
   password: passwordSchema,
 });
 
@@ -35,15 +31,15 @@ const LoginCard = () => {
     setLoading(true);
     setServerError(null);
 
-    // Supabase Sign In
-    const { error } = await supabase.auth.signInWithPassword({
+    // Better Auth Sign In
+    const { error } = await authClient.signIn.email({
       email: data.email,
       password: data.password,
     });
 
     if (error) {
-      // Supabase returns very clear error messages
-      setServerError(error.message);
+      // Better Auth returns error messages in the error object
+      setServerError(error.message || "Error had occured during sign in");
       setLoading(false);
       return;
     }
@@ -52,13 +48,11 @@ const LoginCard = () => {
     navigate("/admin");
   };
 
-  // Social Login Handler (Example for when you're ready)
+  // Social Login Handler (Example using Better Auth for when you're ready)
   // const handleSocialLogin = async (provider: 'google' | 'facebook') => {
-  //   const { error } = await supabase.auth.signInWithOAuth({
+  //   const { error } = await authClient.signIn.social({
   //     provider,
-  //     options: {
-  //       redirectTo: `${window.location.origin}/admin`,
-  //     },
+  //     callbackURL: `${window.location.origin}/admin`, // Redirect after login
   //   });
   //   if (error) setServerError(error.message);
   // };
@@ -121,7 +115,7 @@ const LoginCard = () => {
           </div>
         </div>
 
-        /* Social Login Buttons */
+        {/* Social Login Buttons */}
         {/* <div className="space-y-3">
           <button
             type="button"

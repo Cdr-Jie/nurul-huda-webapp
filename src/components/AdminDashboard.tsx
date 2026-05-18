@@ -21,7 +21,7 @@ interface Module {
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const MODULES: Module[] = [
-  { name: 'Acara Majlis',     icon: CalendarIcon,              color: 'bg-blue-500',    link: '/admin/events'         },
+  { name: 'Acara Majlis',    icon: CalendarIcon,              color: 'bg-blue-500',    link: '/admin/events'       },
   { name: 'Pengurusan Ahli', icon: UsersIcon,                 color: 'bg-emerald-500', link: '/admin/users'         },
   { name: 'Kewangan/Tabung', icon: BanknotesIcon,             color: 'bg-amber-500',   link: '/admin/finance'       },
   { name: 'Pengumuman',      icon: MegaphoneIcon,             color: 'bg-purple-500',  link: '/admin/announcements' },

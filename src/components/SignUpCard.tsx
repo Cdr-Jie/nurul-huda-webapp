@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom"; // Use useNavigate for a better SPA experience
-import { supabase } from '../supabaseClient';
+import { Link, useNavigate } from "react-router-dom"; 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { passwordSchema } from "../lib/validation";
+import { authClient } from '../lib/auth-client'; // Imported Better Auth client
 
 const signUpSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
@@ -32,27 +32,21 @@ const SignUpCard = () => {
     setLoading(true);
     setServerError(null);
 
-    // Supabase SignUp
-    const { error } = await supabase.auth.signUp({
+    // Better Auth SignUp
+    const { error } = await authClient.signUp.email({
       email: values.email,
       password: values.password,
-      options: {
-        // This is how you store the username in Supabase Auth
-        data: {
-          display_name: values.username,
-        },
-      },
+      name: values.username, // Better Auth uses 'name' for the display name
     });
 
     if (error) {
-      setServerError(error.message);
+      // Better Auth returns clear error messages in the error object
+      setServerError(error.message || "Error during signup");
       setLoading(false);
       return;
     }
 
     // Success: Navigate to admin or show a "Check your email" message
-    // Note: If you have "Email Confirmation" enabled in Supabase, 
-    // the user won't be logged in until they click the link.
     navigate("/admin");
   };
 

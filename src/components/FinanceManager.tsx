@@ -178,8 +178,17 @@ const FinanceManager = () => {
       .from('transactions')
       .select('*')
       .order('date', { ascending: false });
-    if (error) console.error(error);
-    else setTransactions(data ?? []);
+    if (error) {
+      console.error(error);
+    } else {
+      // Normalize types — Supabase returns numeric as string, date may include timestamp
+      const normalized = (data ?? []).map(t => ({
+        ...t,
+        amount: Number(t.amount),
+        date: t.date.slice(0, 10), // ensures "YYYY-MM-DD" only
+      }));
+      setTransactions(normalized);
+    }
     setTxLoading(false);
   };
 

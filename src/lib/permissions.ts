@@ -1,101 +1,48 @@
-import { supabase } from "../supabaseClient";
-import type { User } from "@supabase/supabase-js";
+import { createAccessControl } from "better-auth/plugins/access";
+import {
+  defaultStatements,
+  userAc,
+  adminAc,
+} from "better-auth/plugins/admin/access";
 
 /**
- * User roles in the system
+ * make sure to use `as const` so typescript can infer the type correctly
  */
-export const ROLES = {
-  USER: "user",
-  ADMIN: "admin",
-  FINANCE_ADMIN: "finance_admin",
-  SUPER_ADMIN: "super_admin",
+export const statement = {
+  ...defaultStatements,
+  // the defaultStatements permissions
+  // user: create list set-role ban impersonate impersonate-admins delete set-password
+  // session: list revoke delete
+  // Add new permissions below (event)
+  admin: ["view"],
+  event: ["create", "view", "share", "update", "delete"],
+  finance: ["view", "add"]
 } as const;
 
-export type UserRole = (typeof ROLES)[keyof typeof ROLES];
+export const ac = createAccessControl(statement);
 
-/**
- * Permission definitions for each role
- */
-export const rolePermissions = {
-  [ROLES.USER]: {
-    event: ["view"],
-  },
-  [ROLES.ADMIN]: {
-    user: ["create", "list", "set-role", "ban", "delete", "set-password"],
-    session: ["list", "revoke", "delete"],
-    event: ["create", "view", "share", "update", "delete"],
-  },
-  [ROLES.FINANCE_ADMIN]: {
-    user: ["create", "list", "set-role", "ban", "delete", "set-password"],
-    session: ["list", "revoke", "delete"],
-    event: ["create", "view", "share", "update", "delete"],
-    finance: ["view", "add"],
-  },
-  [ROLES.SUPER_ADMIN]: {
-    user: ["create", "list", "set-role", "ban", "delete", "set-password"],
-    session: ["list", "revoke", "delete"],
-    event: ["create", "view", "share", "update", "delete"],
-    finance: ["view", "add"],
-  },
-} as const;
+export const user = ac.newRole({
+  ...userAc.statements,
+  event: ["create", "view", "share"],
+});
 
-/**
- * Get user role from Supabase auth metadata
- */
-export const getUserRole = (user: User | null): UserRole => {
-  if (!user) return ROLES.USER;
-  return (user.user_metadata?.role as UserRole) || ROLES.USER;
-};
+export const admin = ac.newRole({
+  ...adminAc.statements,
+  admin: ["view"],
+  event: ["create", "view", "share", "update", "delete"],
+});
 
-/**
- * Check if user has a specific permission
- */
-export const hasPermission = (
-  user: User | null,
-  resource: string,
-  action: string
-): boolean => {
-  if (!user) return false;
+// The superAdmin will have the same permission as the admin for now
+export const superadmin = ac.newRole({
+  ...adminAc.statements,
+  admin: ["view"],
+  event: ["create", "view", "share", "update", "delete"],
+  finance: ["view", "add"]
+});
 
-  const role = getUserRole(user);
-  const permissions = rolePermissions[role];
-
-  if (!permissions || !(resource in permissions)) {
-    return false;
-  }
-
-  const resourcePermissions = permissions[resource as keyof typeof permissions];
-  return Array.isArray(resourcePermissions) && resourcePermissions.includes(action);
-};
-
-/**
- * Check if user has any of the specified roles
- */
-export const hasRole = (
-  user: User | null,
-  roles: UserRole[]
-): boolean => {
-  if (!user) return false;
-  const userRole = getUserRole(user);
-  return roles.includes(userRole);
-};
-
-/**
- * Get all permissions for a user's role
- */
-export const getUserPermissions = (user: User | null) => {
-  if (!user) return {};
-  const role = getUserRole(user);
-  return rolePermissions[role];
-};
-
-/**
- * Update user role in Supabase
- * Note: This should be called from an admin context only
- */
-export const updateUserRole = async (userId: string, role: UserRole) => {
-  const { error } = await supabase.auth.admin.updateUserById(userId, {
-    user_metadata: { role },
-  });
-  if (error) throw error;
-};
+// The financeAdmin will have the same permission as the admin and addition permission to access finance add and view
+export const financeadmin = ac.newRole({
+    ...adminAc.statements,
+    admin: ["view"],
+    finance: ["view", "add"]
+})
