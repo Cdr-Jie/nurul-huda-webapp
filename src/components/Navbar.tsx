@@ -5,11 +5,6 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface NavItem {
-  name: string;
-  href: string;
-}
-
 interface AuthActionButtonProps {
   isMobile: boolean;
   isPending: boolean;
