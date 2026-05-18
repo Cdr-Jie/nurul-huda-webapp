@@ -6,7 +6,7 @@ import {
   PlusIcon, PencilSquareIcon, TrashIcon, ArrowDownTrayIcon,
   ExclamationTriangleIcon, XMarkIcon, CheckCircleIcon, PhotoIcon,
   MagnifyingGlassIcon, ChevronUpDownIcon, ChevronUpIcon, ChevronDownIcon,
-  ChevronLeftIcon, Squares2X2Icon, ListBulletIcon,
+  Squares2X2Icon, ListBulletIcon,
 } from '@heroicons/react/24/outline';
 import * as XLSX from 'xlsx';
 
