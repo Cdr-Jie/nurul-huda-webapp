@@ -25,9 +25,14 @@ const UserManagement = () => {
   const [totalUsers, setTotalUsers]     = useState(0);
 
   const { data: session, isPending: isSessionPending } = authClient.useSession();
-  const hasPermission = session?.user?.role &&
-    ["admin", "financeadmin", "superadmin"].includes(session.user.role);
+  // ── Permission check based on AC config ──────────────────────────────────────
+  const userRole = session?.user?.role ?? 'user';
 
+  // Only superadmin can manage users (pengguna resource)
+  const hasPermission = !isSessionPending && (userRole === 'superadmin');
+
+  // // For view-only access (admin + financeadmin can see but not edit)
+  // const canViewOnly = !isSessionPending && ['admin', 'financeadmin'].includes(userRole);
   // ── Debounce search ─────────────────────────────────────────────────────────
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(searchQuery), 500);
@@ -206,6 +211,7 @@ const UserManagement = () => {
                     selfId={session?.user?.id ?? ""}
                     biroList={biroList}
                     refetchUsers={fetchUsers}
+                    canEdit={userRole === 'superadmin'} // only superadmin gets action buttons
                   />
                 ))
               )}

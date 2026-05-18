@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { compressImage } from '../utils/imageUpload';
+import { authClient } from '../lib/auth-client';
 import {
   PlusIcon,
   PencilSquareIcon,
@@ -16,9 +18,10 @@ import {
   ChevronUpDownIcon,
   ChevronUpIcon,
   ChevronDownIcon,
+  CalendarIcon,
+  ChevronLeftIcon,
 } from '@heroicons/react/24/outline';
 import * as XLSX from 'xlsx';
-import { ChevronLeftIcon } from '@heroicons/react/24/outline';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -32,19 +35,10 @@ interface Event {
   host_letter_url: string | null;
   is_active: boolean;
   created_at: string;
+  biro_id: string | null;
 }
 
 type EventFormData = Omit<Event, 'id' | 'created_at'>;
-
-const EMPTY_FORM: EventFormData = {
-  title: '',
-  date: '',
-  description: '',
-  organizer: '',
-  image_url: null,
-  host_letter_url: null,
-  is_active: true,
-};
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -132,13 +126,34 @@ const UploadZone: React.FC<UploadZoneProps> = ({
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 const EventsManager = () => {
+  const navigate = useNavigate();
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<{ column: string; ascending: boolean }>({ column: 'date', ascending: false });
 
+  // ─── Session ────────────────────────────────────────────────────────────────────
+  const { data: session } = authClient.useSession();
+  const userBiroId = session?.user?.biro_id ?? null;
+  const userRole = session?.user?.role ?? 'user';
+
+  // superadmin sees everything
+  const isSuperAdmin = userRole === 'superadmin';
+
+  // Create empty form dynamically based on current context
+  const createEmptyForm = (): EventFormData => ({
+    title: '',
+    date: '',
+    description: '',
+    organizer: '',
+    image_url: null,
+    host_letter_url: null,
+    is_active: true,
+    biro_id: userBiroId,
+  });
+
   const [modal, setModal] = useState<{ open: boolean; editing: Event | null }>({ open: false, editing: null });
-  const [form, setForm] = useState<EventFormData>(EMPTY_FORM);
+  const [form, setForm] = useState<EventFormData>(createEmptyForm());
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -205,32 +220,58 @@ const EventsManager = () => {
 
   const fetchEvents = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+
+    let query = supabase
       .from('events')
       .select('*')
       .order('date', { ascending: false });
+
+    // Superadmin sees all events
+    // Everyone else sees only their biro's events + events with no biro
+    if (!isSuperAdmin) {
+      if (userBiroId) {
+        query = query.or(`biro_id.eq.${userBiroId},biro_id.is.null`);
+      } else {
+        // User has no biro assigned — only show events with no biro
+        query = query.is('biro_id', null);
+      }
+    }
+
+    const { data, error } = await query;
     if (error) console.error('Error fetching events:', error);
     else setEvents(data ?? []);
     setLoading(false);
-  };
+  }; 
 
-  useEffect(() => { fetchEvents(); }, []);
+  useEffect(() => {
+    if (session !== undefined) fetchEvents();
+  }, [session]);
 
   // ── Modal helpers ───────────────────────────────────────────────────────────
 
   const openAdd = () => {
-    setForm(EMPTY_FORM); setImageFile(null); setLetterFile(null);
-    setFormError(null); setModal({ open: true, editing: null });
+    setForm(createEmptyForm());
+    setImageFile(null);
+    setLetterFile(null);
+    setFormError(null);
+    setModal({ open: true, editing: null });
   };
 
   const openEdit = (event: Event) => {
     setForm({
-      title: event.title, date: event.date, description: event.description,
-      organizer: event.organizer, image_url: event.image_url,
-      host_letter_url: event.host_letter_url, is_active: event.is_active,
+      title: event.title,
+      date: event.date,
+      description: event.description,
+      organizer: event.organizer,
+      image_url: event.image_url,
+      host_letter_url: event.host_letter_url,
+      is_active: event.is_active,
+      biro_id: event.biro_id, // ← keep existing biro
     });
-    setImageFile(null); setLetterFile(null);
-    setFormError(null); setModal({ open: true, editing: event });
+    setImageFile(null);
+    setLetterFile(null);
+    setFormError(null);
+    setModal({ open: true, editing: event });
   };
 
   const closeModal = () => setModal({ open: false, editing: null });
@@ -348,9 +389,15 @@ const EventsManager = () => {
 
       {/* Header Content Layer */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <div className="text-left">
-          <h1 className="text-2xl font-bold text-gray-900">Pengurusan Acara</h1>
-          <p className="text-gray-500 text-sm">Uruskan aktiviti masjid</p>
+        <div className="text-left flex items-center gap-8">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Pengurusan Acara</h1>
+            <p className="text-gray-500 text-sm">Uruskan aktiviti masjid</p>
+          </div>
+          <button onClick={() => navigate('/admin/calendar')}
+            className="flex items-center justify-center gap-2 bg-purple-600 text-white px-3 py-2 rounded-lg hover:bg-purple-700 font-semibold text-sm whitespace-nowrap h-fit ml-4">
+            <CalendarIcon className="w-4 h-8" /> Kalendar
+          </button>
         </div>
 
         <div className="flex gap-2 w-full sm:w-auto">

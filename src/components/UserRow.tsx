@@ -57,11 +57,13 @@ export default function UserRow({
   selfId,
   biroList,
   refetchUsers,
+  canEdit,
 }: Readonly<{
   user: UserWithRole;
   selfId: string;
   biroList: Biro[];
   refetchUsers: () => void;
+  canEdit: boolean;
 }>) {
   const isSelf = user.id === selfId;
 
@@ -226,7 +228,7 @@ export default function UserRow({
 
         {/* Actions */}
         <td className="px-4 py-3 text-right">
-          {!isSelf ? (
+          {!isSelf && canEdit ? (
             <div ref={menuRef} className="relative inline-block">
               <button onClick={() => setIsMenuOpen(o => !o)}
                 className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-200 rounded-md transition-colors">
