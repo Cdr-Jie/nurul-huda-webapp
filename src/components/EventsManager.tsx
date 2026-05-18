@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabaseClient';
 import { compressImage } from '../utils/imageUpload';
+import { authClient } from '../lib/auth-client';
 import {
   PlusIcon,
   PencilSquareIcon,
@@ -137,6 +138,15 @@ const EventsManager = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<{ column: string; ascending: boolean }>({ column: 'date', ascending: false });
 
+  // ─── Session ────────────────────────────────────────────────────────────────────
+  const { data: session } = authClient.useSession();
+  const userBiroId = session?.user?.biro_id ?? null;
+  const userRole = session?.user?.role ?? 'user';
+
+  // superadmin sees everything
+  const isSuperAdmin = userRole === 'superadmin';
+
+
   const [modal, setModal] = useState<{ open: boolean; editing: Event | null }>({ open: false, editing: null });
   const [form, setForm] = useState<EventFormData>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
@@ -205,16 +215,32 @@ const EventsManager = () => {
 
   const fetchEvents = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+
+    let query = supabase
       .from('events')
       .select('*')
       .order('date', { ascending: false });
+
+    // Superadmin sees all events
+    // Everyone else sees only their biro's events + events with no biro
+    if (!isSuperAdmin) {
+      if (userBiroId) {
+        query = query.or(`biro_id.eq.${userBiroId},biro_id.is.null`);
+      } else {
+        // User has no biro assigned — only show events with no biro
+        query = query.is('biro_id', null);
+      }
+    }
+
+    const { data, error } = await query;
     if (error) console.error('Error fetching events:', error);
     else setEvents(data ?? []);
     setLoading(false);
-  };
+  }; 
 
-  useEffect(() => { fetchEvents(); }, []);
+  useEffect(() => {
+    if (session !== undefined) fetchEvents();
+  }, [session]);
 
   // ── Modal helpers ───────────────────────────────────────────────────────────
 
