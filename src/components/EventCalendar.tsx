@@ -96,27 +96,20 @@ const EventCalendar = () => {
   const fetchEvents = async () => {
     setLoading(true);
 
-    let query = supabase.from('events').select('*').order('date', { ascending: true });
+    const { data, error } = await supabase
+      .from('events')
+      .select('*')
+      .eq('is_active', true)
+      .order('date', { ascending: true });
 
-    // Superadmin sees all events
-    // Everyone else sees only their biro's events + events with no biro
-    if (!isSuperAdmin) {
-      if (userBiroId) {
-        query = query.or(`biro_id.eq.${userBiroId},biro_id.is.null`);
-      } else {
-        query = query.is('biro_id', null);
-      }
-    }
-
-    const { data, error } = await query;
     if (error) console.error('Error fetching events:', error);
     else setEvents(data ?? []);
     setLoading(false);
   };
 
   useEffect(() => {
-    if (session !== undefined) fetchEvents();
-  }, [session]);
+    fetchEvents();
+  }, []);
 
   // ── Calendar generation ────────────────────────────────────────────────────
 
