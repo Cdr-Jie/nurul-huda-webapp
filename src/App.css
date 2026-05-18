@@ -400,7 +400,7 @@ section {
 /* ============================================
    11. FLEX & LAYOUT
    ============================================ */
-.flex {
+/* .flex {
   display: flex;
 }
 
@@ -412,7 +412,7 @@ section {
   display: flex;
   align-items: center;
   justify-content: center;
-}
+} */
 
 .gap-3 {
   gap: 0.75rem;

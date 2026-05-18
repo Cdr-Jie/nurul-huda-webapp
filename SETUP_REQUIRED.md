@@ -58,7 +58,7 @@ Run the development server:
 npm run dev
 ```
 
-This will start:
+This will start:    
 - Vite dev server on `http://localhost:5173`
 - Express backend on `http://localhost:3001`
 

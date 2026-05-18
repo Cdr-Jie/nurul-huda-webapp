@@ -5,6 +5,7 @@ import AdminPage from './pages/admin/AdminPage';
 import LoginPage from './pages/authentication/LoginPage';
 import SignUpPage from './pages/authentication/SignUpPage';
 import EventsPage from './pages/EventsPage';
+import AdminEventPage from './pages/admin/AdminEventPage';
 import FinancePage from './pages/FinancePage';
 import { useSession, authClient } from './lib/auth-client';
 import UserPage from './pages/UserPage';
@@ -75,8 +76,9 @@ function App() {
       
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/events" element={<EventsPage />} />
         <Route path="/admin" element={session ? <AdminPage /> : <Navigate to="/login" />} />
-        <Route path="/admin/events" element={session ? <EventsPage /> : <Navigate to ="/login" />} />
+        <Route path="/admin/events" element={session ? <AdminEventPage /> : <Navigate to ="/login" />} />
         <Route path="/admin/finance" element={session ? <FinancePage /> : <Navigate to ="/login" />} />
         <Route path="/admin/users" element={session ? <UserPage /> : <Navigate to ="/login" />} />
         <Route path="/settings" element={session ? <SettingsPage /> : <Navigate to ="/login" />} />
