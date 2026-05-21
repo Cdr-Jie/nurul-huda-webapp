@@ -1,5 +1,6 @@
 import { createAuthClient } from "better-auth/react";
-import { adminClient } from "better-auth/client/plugins";
+import { adminClient, inferAdditionalFields } from "better-auth/client/plugins";
+import type { auth } from "./auth";
 import { ac, user, admin, financeadmin, superadmin } from "./permissions";
 
 export const authClient = createAuthClient({
@@ -15,7 +16,11 @@ export const authClient = createAuthClient({
       },
       adminRoles: ["admin", "financeadmin", "superadmin"],
     }),
+    inferAdditionalFields<typeof auth>(),
   ],
 });
 
 export const { signIn, signUp, signOut, useSession } = authClient;
+
+export type user = typeof authClient.$Infer.Session.user
+export type session = typeof authClient.$Infer.Session.session

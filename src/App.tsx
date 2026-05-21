@@ -9,6 +9,9 @@ import FinancePage from './pages/FinancePage';
 import { useSession, authClient } from './lib/auth-client';
 import UserPage from './pages/UserPage';
 import SettingsPage from './pages/SettingsPage';
+import ProfilePage from './pages/ProfilePage';
+import AdminEventPage from './pages/admin/AdminEventPage';
+import UserEditPage from './pages/UserEditPage';
 
 // 1. Define the Impersonation Indicator inside App.tsx
 function ImpersonationIndicator() {
@@ -32,7 +35,6 @@ function ImpersonationIndicator() {
         className="flex items-center justify-center p-2.5 bg-red-600 hover:bg-red-700 text-white rounded-md shadow-lg transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
         title={"Stop impersonating " + session.user.email}
       >
-        {/* Lucide-react UserX SVG */}
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
           width="20" 
@@ -69,19 +71,24 @@ function App() {
   return (
     <Router>
       <Navbar />
-      
-      {/* 3. Drop the indicator globally inside the Router so it can use 'navigate' */}
       <ImpersonationIndicator />
       
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/events" element={<EventsPage />} />
+        
+        {/* 2. Add the Profile Route */}
+        <Route path="/profile" element={session ? <ProfilePage /> : <Navigate to="/login" />} />
+        
+        {/* ... existing routes ... */}
         <Route path="/admin" element={session ? <AdminPage /> : <Navigate to="/login" />} />
-        <Route path="/admin/events" element={session ? <EventsPage /> : <Navigate to ="/login" />} />
+        <Route path="/admin/events" element={session ? <AdminEventPage /> : <Navigate to ="/login" />} />
         <Route path="/admin/finance" element={session ? <FinancePage /> : <Navigate to ="/login" />} />
         <Route path="/admin/users" element={session ? <UserPage /> : <Navigate to ="/login" />} />
         <Route path="/settings" element={session ? <SettingsPage /> : <Navigate to ="/login" />} />
-        <Route path="/login" element={!session ? <LoginPage /> : <Navigate to="/" />} />
-        <Route path="/signup" element={!session ? <SignUpPage /> : <Navigate to="/" />} />
+        <Route path="/login" element={session ? <Navigate to="/" /> : <LoginPage />} />
+        <Route path="/signup" element={session ? <Navigate to="/" /> : <SignUpPage />} />
+        <Route path="/admin/users/:userId" element={<UserEditPage />} />
         <Route path="*" element={<div className="p-4">Page Not Found</div>} />
       </Routes>
     </Router>

@@ -39,9 +39,34 @@ export const auth = betterAuth({
     updateAge: 60 * 60 * 24, // 1 day
     cookieCache: {
       enabled: true,
-      maxAge: 60 
+      maxAge: 60,
     }
   },
+
+  //Extending core schema 
+    user: {
+      changeEmail: {
+        enabled: false,
+      },
+      additionalFields: {
+        phone: {
+          type: "string",
+          required: false,
+        },
+        biro_id: {
+          type: "string",
+          required: false,
+          //input: false,
+        },
+        position: {
+          type: "string",
+          required: false,
+          //input: false,
+        }
+      }
+    },
+
+
 
   plugins: [
     adminPlugin({
@@ -51,3 +76,6 @@ export const auth = betterAuth({
     })
   ],
 });
+
+export type session = typeof auth.$Infer.Session.session
+export type user = typeof auth.$Infer.Session.user
