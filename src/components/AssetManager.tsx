@@ -5,10 +5,11 @@ import { authClient } from '../lib/auth-client';
 import {
   PlusIcon, PencilSquareIcon, TrashIcon, ArrowDownTrayIcon,
   ExclamationTriangleIcon, XMarkIcon, CheckCircleIcon, PhotoIcon,
-  MagnifyingGlassIcon, ChevronUpDownIcon, ChevronUpIcon, ChevronDownIcon,
+  MagnifyingGlassIcon, ChevronUpDownIcon, ChevronUpIcon, ChevronDownIcon, ChevronLeftIcon, 
   Squares2X2Icon, ListBulletIcon,
 } from '@heroicons/react/24/outline';
 import * as XLSX from 'xlsx';
+import { useNavigate } from 'react-router-dom';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -134,6 +135,7 @@ const AssetManager = () => {
   const userRole = session?.user?.role ?? 'user';
   const isSuperAdmin = userRole === 'superadmin';
   const isAdmin = ['admin', 'financeadmin', 'superadmin'].includes(userRole);
+  const navigate = useNavigate();
 
   // ── State ────────────────────────────────────────────────────────────────────
   const [assets, setAssets]               = useState<Asset[]>([]);
@@ -421,30 +423,21 @@ const assetsWithCounts = await Promise.all(
   // ─── Render ───────────────────────────────────────────────────────────────────
 
   return (
-    <div className="p-4 max-w-7xl mx-auto pb-20 text-left">
-
-      {/* Back */}
-      {/* <div className="w-full flex justify-start mb-2">
-        <button onClick={() => window.history.back()}
-          className="flex items-center text-sm text-gray-500 hover:text-blue-600 transition-colors group">
-          <ChevronLeftIcon className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" />
-          Kembali ke Menu Pengurusan
-        </button>
-      </div> */}
-
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        {/* <div>
-          <h1 className="text-2xl font-bold text-gray-900">Pengurusan Aset</h1>
-          <p className="text-gray-500 text-sm">Urus aset masjid yang dipinjamkan</p>
-        </div> */}
-        <div className="flex gap-2 w-full sm:w-auto">
+    // 1. Root container commands full-width layouts across standard grids
+    <div className="w-full text-left pb-20">
+      
+      {/* Header Section Container - Clean layout block for action items */}
+      <div className="w-full flex flex-col items-center text-center mb-6 gap-4">
+        
+        {/* Buttons / Actions Row - Balanced and centered perfectly right beneath parent page tabs */}
+        <div className="flex gap-2 w-full sm:w-auto justify-center items-center">
           <button onClick={exportToExcel}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 font-semibold text-sm">
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 font-semibold text-sm shadow-sm transition-colors">
             <ArrowDownTrayIcon className="w-4 h-4" /> Export
           </button>
+          
           <button onClick={openAdd}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold text-sm">
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold text-sm shadow-sm transition-colors">
             <PlusIcon className="w-4 h-4" /> Tambah Aset
           </button>
         </div>

@@ -42,7 +42,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, onClick }) => {
   return (
     <button
       onClick={onClick}
-      className="flex flex-col items-center justify-center p-4 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all active:scale-95 h-36 md:h-44 text-center w-full"
+      className="flex flex-col items-center justify-center p-4 bg-white rounded-2xl shadow-sm border border-gray-300 ring-1 ring-black/5 hover:border-blue-500 hover:ring-blue-500 hover:shadow-md transition-all active:scale-95 h-36 md:h-44 text-center w-full group"
     >
       <div className={`${module.color} w-10 h-10 md:w-14 md:h-14 flex items-center justify-center rounded-xl mb-3 shadow-sm`}>
         <Icon className="text-white w-6 h-6 md:w-8 md:h-8" />
@@ -50,7 +50,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, onClick }) => {
       <h3 className="font-bold text-gray-800 text-xs md:text-base leading-tight">
         {module.name}
       </h3>
-      <p className="hidden md:block text-[10px] text-gray-400 mt-1 uppercase tracking-wider font-semibold">
+      <p className="hidden md:block text-[10px] text-gray-400 mt-1 uppercase tracking-wider font-semibold group-hover:text-blue-500 transition-colors">
         Open Module
       </p>
     </button>
@@ -73,20 +73,7 @@ const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 pb-20">
-      <header className="mb-8 flex justify-between items-center px-2">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Panel Admin</h1>
-          <p className="text-sm text-gray-500">Nurul Huda Web App</p>
-        </div>
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-2 p-2 text-gray-400 hover:text-red-500 transition"
-        >
-          <ArrowRightStartOnRectangleIcon className="w-6 h-6" />
-          <span className="text-sm font-bold">Log Keluar</span>
-        </button>
-      </header>
+    <div className="min-h-screen bg-gray-50 p-4 pt-8 pb-20 max-w-7xl mx-auto w-full">
 
       {/*
         Mobile:  2 columns — 5 cards = 2 / 2 / 1 (last card centered via the wrapper below)
