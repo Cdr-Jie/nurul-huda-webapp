@@ -4,8 +4,8 @@ import {
   CubeIcon,
   UsersIcon,
   BanknotesIcon,
-  PlayCircleIcon,
-  PhotoIcon,
+  // PlayCircleIcon,
+  // PhotoIcon,
 } from '@heroicons/react/24/outline';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
