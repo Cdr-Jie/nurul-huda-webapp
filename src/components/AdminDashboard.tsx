@@ -6,9 +6,7 @@ import {
   BanknotesIcon,
   PlayCircleIcon,
   PhotoIcon,
-  ArrowRightStartOnRectangleIcon,
 } from '@heroicons/react/24/outline';
-import { supabase } from '../supabaseClient';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -61,16 +59,6 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, onClick }) => {
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      navigate('/');
-    } catch (error: any) {
-      console.error('Error logging out:', error.message);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 pt-8 pb-20 max-w-7xl mx-auto w-full">

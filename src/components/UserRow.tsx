@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { authClient } from "../lib/auth-client";
 import { supabase } from "../supabaseClient";
 import {
   PencilSquareIcon, TrashIcon, NoSymbolIcon,
-  CheckCircleIcon, XMarkIcon, EllipsisVerticalIcon,
+  CheckCircleIcon, XMarkIcon
 } from "@heroicons/react/24/outline";
 import type { Biro } from "./UserManagement";
 
@@ -67,15 +67,12 @@ export default function UserRow({
 }>) {
   const isSelf = user.id === selfId;
 
-  const [isMenuOpen, setIsMenuOpen]         = useState(false);
   const [isEditOpen, setIsEditOpen]         = useState(false);
   const [isDeleteOpen, setIsDeleteOpen]     = useState(false);
   const [isBanOpen, setIsBanOpen]           = useState(false);
   const [saving, setSaving]                 = useState(false);
   const [formError, setFormError]           = useState<string | null>(null);
   const [banReason, setBanReason]           = useState('');
-
-  const menuRef = useRef<HTMLDivElement>(null);
 
   // Edit form state
   const [editName, setEditName]         = useState(user.name ?? '');
@@ -86,16 +83,6 @@ export default function UserRow({
 
   const biroName = biroList.find(b => b.id === user.biro_id)?.name ?? '—';
 
-  // Close dropdown on outside click
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node))
-        setIsMenuOpen(false);
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
   const openEdit = () => {
     setEditName(user.name ?? '');
     setEditRole(user.role ?? 'user');
@@ -103,7 +90,6 @@ export default function UserRow({
     setEditPosition(user.position ?? '');
     setEditPhone(user.phone ?? '');
     setFormError(null);
-    setIsMenuOpen(false);
     setIsEditOpen(true);
   };
 
