@@ -12,6 +12,7 @@ import FinancePage from './pages/FinancePage';
 import { useSession, authClient } from './lib/auth-client';
 import UserPage from './pages/UserPage';
 import SettingsPage from './pages/SettingsPage';
+import MasjidHistory from './components/MasjidHistory';
 
 // 1. Define the Impersonation Indicator inside App.tsx
 function ImpersonationIndicator() {
@@ -79,6 +80,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/events" element={<EventsPage />} />
+        <Route path="/sejarah" element={<MasjidHistory />} />
         <Route path="/admin" element={session ? <AdminPage /> : <Navigate to="/login" />} />
         <Route path="/admin/events" element={session ? <AdminEventPage /> : <Navigate to ="/login" />} />
         <Route path="/admin/calendar" element={session ? <EventCalendarPage /> : <Navigate to ="/login" />} />

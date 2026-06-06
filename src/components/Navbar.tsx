@@ -67,7 +67,7 @@ const Navbar = () => {
 
   const navItems = [
     { name: "Home", href: "/" },
-    { name: "Carta Organisasi", href: "/carta" },
+    // { name: "Carta Organisasi", href: "/carta" },
     { name: "Sejarah Masjid", href: "/sejarah" },
     // Only add this if the user is logged in
     ...(session?.user ? [{ name: "Pengurusan", href: "/admin" }] : []),

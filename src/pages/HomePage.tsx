@@ -101,7 +101,7 @@ const HomePage: React.FC = () => {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-8 px-4">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
             <div>
               <h4 className="text-xl font-bold mb-4">Masjid Nurul Huda</h4>
               <p className="text-gray-400 text-sm">Menyemai Taqwa, Memperkasa Ummah</p>
@@ -116,20 +116,20 @@ const HomePage: React.FC = () => {
               </ul>
             </div>
 
-            <div>
+            {/* <div>
               <h4 className="font-bold mb-4">Program</h4>
               <ul className="space-y-2 text-gray-400 text-sm">
                 <li><a href="#" className="hover:text-white">Kelas Quran</a></li>
                 <li><a href="#" className="hover:text-white">Kuliah Islam</a></li>
                 <li><a href="#" className="hover:text-white">Tadika Islam</a></li>
               </ul>
-            </div>
+            </div> */}
 
             <div>
               <h4 className="font-bold mb-4">Ikuti Kami</h4>
               <ul className="space-y-2 text-gray-400 text-sm">
                 <li><a href="https://www.facebook.com/profile.php?id=61587368138930" className="hover:text-white">Facebook</a></li>
-                <li><a href="#" className="hover:text-white">Instagram</a></li>
+                {/* <li><a href="#" className="hover:text-white">Instagram</a></li> */}
                 <li><a href="#" className="hover:text-white">WhatsApp</a></li>
               </ul>
             </div>

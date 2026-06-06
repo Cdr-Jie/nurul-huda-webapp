@@ -57,8 +57,8 @@ const CONDITION_COLORS: Record<Condition, { bg: string; text: string; label: str
 };
 
 const CATEGORIES = [
-  'Furniture', 'Electronics', 'Audio', 'Decoration',
-  'Kitchen', 'Sports', 'Tools', 'Other',
+  'Perabot', 'Elektronik', 'Audio', 'Hiasan',
+  'Dapur', 'Sukan', 'Alatan', 'Lain-lain',
 ];
 
 // ─── Shared UI ────────────────────────────────────────────────────────────────
