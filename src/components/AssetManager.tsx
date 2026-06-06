@@ -5,11 +5,10 @@ import { authClient } from '../lib/auth-client';
 import {
   PlusIcon, PencilSquareIcon, TrashIcon, ArrowDownTrayIcon,
   ExclamationTriangleIcon, XMarkIcon, CheckCircleIcon, PhotoIcon,
-  MagnifyingGlassIcon, ChevronUpDownIcon, ChevronUpIcon, ChevronDownIcon, ChevronLeftIcon, 
+  MagnifyingGlassIcon, ChevronUpDownIcon, ChevronUpIcon, ChevronDownIcon, 
   Squares2X2Icon, ListBulletIcon,
 } from '@heroicons/react/24/outline';
 import * as XLSX from 'xlsx';
-import { useNavigate } from 'react-router-dom';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -135,7 +134,6 @@ const AssetManager = () => {
   const userRole = session?.user?.role ?? 'user';
   const isSuperAdmin = userRole === 'superadmin';
   const isAdmin = ['admin', 'financeadmin', 'superadmin'].includes(userRole);
-  const navigate = useNavigate();
 
   // ── State ────────────────────────────────────────────────────────────────────
   const [assets, setAssets]               = useState<Asset[]>([]);
