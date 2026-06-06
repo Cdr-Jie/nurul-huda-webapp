@@ -156,11 +156,11 @@ const FinanceCharts: React.FC<FinanceChartsProps> = ({ transactions }) => {
         </ResponsiveContainer>
       </div>
 
-      {/* Two donut charts side by side on md+, stacked on mobile */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Donut charts stacked full-width to match transactions layout */}
+      <div className="space-y-4">
 
         {/* Expense donut */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 w-full">
           <h3 className="text-sm font-bold text-gray-700 mb-1">Perbelanjaan mengikut Kategori</h3>
           <p className="text-xs text-gray-400 mb-4">Pecahan jumlah keluar</p>
           {expenseByCategory.length === 0 ? (
@@ -183,7 +183,7 @@ const FinanceCharts: React.FC<FinanceChartsProps> = ({ transactions }) => {
         </div>
 
         {/* Income donut */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 w-full">
           <h3 className="text-sm font-bold text-gray-700 mb-1">Pendapatan mengikut Kategori</h3>
           <p className="text-xs text-gray-400 mb-4">Pecahan jumlah masuk</p>
           {incomeByCategory.length === 0 ? (

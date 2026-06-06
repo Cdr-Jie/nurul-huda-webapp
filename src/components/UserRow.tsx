@@ -209,55 +209,67 @@ export default function UserRow({
         </td>
 
         {/* Role */}
-        <td className="px-4 py-3 hidden sm:table-cell">
-          <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${roleBadgeCls(user.role)}`}>
-            {ROLE_LABELS[user.role] ?? user.role}
-          </span>
+        <td className="px-4 py-3 text-center hidden sm:table-cell">
+          <div className="flex justify-center">
+            <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${roleBadgeCls(user.role)}`}>
+              {ROLE_LABELS[user.role] ?? user.role}
+            </span>
+          </div>
         </td>
 
         {/* Biro */}
-        <td className="px-4 py-3 text-sm text-gray-600 hidden md:table-cell">{biroName}</td>
+        <td className="px-4 py-3 text-center text-sm text-gray-600 hidden md:table-cell">
+          {biroName}
+        </td>
 
         {/* Jawatan */}
-        <td className="px-4 py-3 text-sm text-gray-600 hidden md:table-cell">{user.position ?? '—'}</td>
+        <td className="px-4 py-3 text-center text-sm text-gray-600 hidden md:table-cell">
+          {user.position ?? '—'}
+        </td>
 
         {/* Date */}
-        <td className="px-4 py-3 text-sm text-gray-500 hidden lg:table-cell">
+        <td className="px-4 py-3 text-center text-sm text-gray-500 hidden lg:table-cell">
           {new Date(user.createdAt).toLocaleDateString('ms-MY')}
         </td>
 
-        {/* Actions */}
-        <td className="px-4 py-3 text-right">
+        {/* Actions - Exposed Inline Actions */}
+        <td className="px-4 py-3 text-center">
           {!isSelf && canEdit ? (
-            <div ref={menuRef} className="relative inline-block">
-              <button onClick={() => setIsMenuOpen(o => !o)}
-                className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-200 rounded-md transition-colors">
-                <EllipsisVerticalIcon className="w-5 h-5" />
+            <div className="flex items-center justify-center gap-3">
+              {/* Edit Button */}
+              <button 
+                onClick={openEdit}
+                className="p-1.5 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-md transition-colors"
+                title="Edit Maklumat"
+              >
+                <PencilSquareIcon className="w-5 h-5" />
               </button>
 
-              {isMenuOpen && (
-                <div className="absolute right-0 top-9 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-20 py-1 text-left">
-                  <div className="px-3 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 border-b border-gray-100">
-                    Tindakan
-                  </div>
-                  <button onClick={openEdit}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2">
-                    <PencilSquareIcon className="w-4 h-4" /> Edit Maklumat
-                  </button>
-                  <button onClick={() => { setIsBanOpen(true); setIsMenuOpen(false); setBanReason(''); }}
-                    className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 ${user.banned ? 'text-green-600 hover:bg-green-50' : 'text-amber-600 hover:bg-amber-50'}`}>
-                    {user.banned
-                      ? <><CheckCircleIcon className="w-4 h-4" /> Nyahsekat</>
-                      : <><NoSymbolIcon className="w-4 h-4" /> Sekat Pengguna</>
-                    }
-                  </button>
-                  <div className="border-t border-gray-100 my-1" />
-                  <button onClick={() => { setIsDeleteOpen(true); setIsMenuOpen(false); }}
-                    className="w-full text-left px-4 py-2 text-sm text-red-600 font-medium hover:bg-red-50 flex items-center gap-2">
-                    <TrashIcon className="w-4 h-4" /> Padam Pengguna
-                  </button>
-                </div>
-              )}
+              {/* Sekat / Nyahsekat Button */}
+              <button 
+                onClick={() => { setIsBanOpen(true); setBanReason(''); }}
+                className={`p-1.5 rounded-md transition-colors ${
+                  user.banned 
+                    ? 'text-green-600 hover:text-green-900 hover:bg-green-50' 
+                    : 'text-amber-600 hover:text-amber-900 hover:bg-amber-50'
+                }`}
+                title={user.banned ? "Nyahsekat" : "Sekat Pengguna"}
+              >
+                {user.banned ? (
+                  <CheckCircleIcon className="w-5 h-5" />
+                ) : (
+                  <NoSymbolIcon className="w-5 h-5" />
+                )}
+              </button>
+
+              {/* Padam Button */}
+              <button 
+                onClick={() => setIsDeleteOpen(true)}
+                className="p-1.5 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-md transition-colors"
+                title="Padam Pengguna"
+              >
+                <TrashIcon className="w-5 h-5" />
+              </button>
             </div>
           ) : (
             <span className="text-xs text-gray-400 italic">—</span>

@@ -379,7 +379,7 @@ const EventsManager = () => {
       {/* Navigation Layer - This forces the button to the far left */}
       <div className="w-full flex justify-start mb-2">
         <button 
-          onClick={() => window.history.back()} 
+          onClick={() => navigate('/admin')} 
           className="flex items-center text-sm text-gray-500 hover:text-blue-600 transition-colors group"
         >
           <ChevronLeftIcon className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" />
@@ -387,27 +387,45 @@ const EventsManager = () => {
         </button>
       </div>
 
-      {/* Header Content Layer */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <div className="text-left flex items-center gap-8">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Pengurusan Acara</h1>
-            <p className="text-gray-500 text-sm">Uruskan aktiviti masjid</p>
-          </div>
-          <button onClick={() => navigate('/admin/calendar')}
-            className="flex items-center justify-center gap-2 bg-purple-600 text-white px-3 py-2 rounded-lg hover:bg-purple-700 font-semibold text-sm whitespace-nowrap h-fit ml-4">
-            <CalendarIcon className="w-4 h-8" /> Kalendar
-          </button>
+      {/* Header Content Layer - Polished & Centered */}
+      <div className="flex flex-col items-center text-center mb-8 mt-4 w-full">
+        {/* Title and Subtitle */}
+        <div>
+          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+            Pengurusan Acara
+          </h1>
+          <p className="text-gray-500 text-sm mt-1">
+            Uruskan aktiviti masjid
+          </p>
         </div>
 
-        <div className="flex gap-2 w-full sm:w-auto">
-          <button onClick={exportToExcel}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 font-semibold text-sm">
-            <ArrowDownTrayIcon className="w-4 h-4" /> Export
+        {/* Button Group Container */}
+        <div className="flex flex-wrap justify-center items-center gap-3 mt-6 w-full sm:w-auto">
+          {/* Kalendar Button */}
+          <button 
+            onClick={() => navigate('/admin/calendar')}
+            className="inline-flex items-center justify-center gap-2 bg-purple-600 text-white px-4 py-2.5 rounded-lg hover:bg-purple-700 font-semibold text-sm shadow-sm transition-colors duration-150 whitespace-nowrap"
+          >
+            <CalendarIcon className="w-4 h-4" /> 
+            <span>Kalendar</span>
           </button>
-          <button onClick={openAdd}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold text-sm">
-            <PlusIcon className="w-4 h-4" /> Tambah Acara
+
+          {/* Export Button */}
+          <button 
+            onClick={exportToExcel}
+            className="inline-flex items-center justify-center gap-2 bg-emerald-600 text-white px-4 py-2.5 rounded-lg hover:bg-emerald-700 font-semibold text-sm shadow-sm transition-colors duration-150"
+          >
+            <ArrowDownTrayIcon className="w-4 h-4" /> 
+            <span>Export</span>
+          </button>
+
+          {/* Tambah Acara Button */}
+          <button 
+            onClick={openAdd}
+            className="inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 font-semibold text-sm shadow-sm transition-colors duration-150"
+          >
+            <PlusIcon className="w-4 h-4" /> 
+            <span>Tambah Acara</span>
           </button>
         </div>
       </div>

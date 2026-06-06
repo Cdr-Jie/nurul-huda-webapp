@@ -8,6 +8,7 @@ import {
 } from '@heroicons/react/24/outline';
 import * as XLSX from 'xlsx';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
+import { useNavigate } from 'react-router-dom';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -144,6 +145,7 @@ const TabungCard = ({ tabung, onEdit, onDelete }: {
 
 const FinanceManager = () => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('transactions');
+  const navigate = useNavigate();
 
   // Transactions state
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -337,7 +339,7 @@ const FinanceManager = () => {
       {/* Navigation Layer - Anchored to the far left */}
       <div className="w-full flex justify-start mb-2">
         <button 
-          onClick={() => window.history.back()} 
+          onClick={() => navigate('/admin')}
           className="flex items-center text-sm text-gray-500 hover:text-blue-600 transition-colors group"
         >
           <ChevronLeftIcon className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" />
@@ -345,17 +347,27 @@ const FinanceManager = () => {
         </button>
       </div>
 
-      {/* Header Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <div className="text-left">
-          <h1 className="text-2xl font-bold text-gray-800">Kewangan & Tabung</h1>
-          <p className="text-gray-500 text-sm">Rekod kewangan dan kutipan dana masjid</p>
+      {/* Header Section - Centered Layout */}
+      <div className="flex flex-col items-center text-center mb-8 mt-4 w-full">
+        <div>
+          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+            Kewangan & Tabung
+          </h1>
+          <p className="text-gray-500 text-sm mt-1 max-w-md mx-auto">
+            Rekod kewangan dan kutipan dana masjid
+          </p>
         </div>
 
-        <button onClick={exportToExcel}
-          className="flex items-center justify-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 font-semibold text-sm w-full sm:w-auto">
-          <ArrowDownTrayIcon className="w-4 h-4" /> Export Excel
-        </button>
+        {/* Export Button - Centered Below Text */}
+        <div className="mt-4">
+          <button 
+            onClick={exportToExcel}
+            className="flex items-center justify-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors shadow-sm text-sm font-medium"
+          >
+            <ArrowDownTrayIcon className="w-4 h-4" /> 
+            Export Excel
+          </button>
+        </div>
       </div>
 
       {/* Summary cards */}
@@ -399,7 +411,7 @@ const FinanceManager = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-6 w-full sm:w-fit">
+      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-6 w-full">
         {(['transactions', 'tabung', 'charts'] as ActiveTab[]).map(tab => (
           <button key={tab} onClick={() => setActiveTab(tab)}
             className={`flex-1 sm:flex-none px-5 py-2 rounded-lg text-sm font-semibold transition ${
@@ -412,58 +424,102 @@ const FinanceManager = () => {
 
       {/* ── Transactions tab ─────────────────────────────────────────────────── */}
       {activeTab === 'transactions' && (
-        <>
+        <div className="w-full bg-white border border-gray-100 rounded-xl p-6 shadow-sm mt-4">
           {/* Toolbar */}
           <div className="flex flex-col sm:flex-row gap-3 mb-4">
+            {/* Search Bar - Fixed Overlap */}
             <div className="relative flex-1">
+              {/* Left Icon */}
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-              <input type="text" placeholder="Cari kategori, penerangan, tarikh..."
-                value={txSearch} onChange={e => setTxSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" />
+              
+              <input
+                type="text"
+                placeholder="Cari kategori, penerangan, tarikh..."
+                value={txSearch}
+                onChange={e => setTxSearch(e.target.value)}
+                style={{ paddingLeft: '3rem', paddingRight: '3rem' }} // Forces 48px of clear space
+                className="w-full py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              />
+
+              {/* Right Button (Clear) */}
               {txSearch && (
-                <button onClick={() => setTxSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                <button
+                  onClick={() => setTxSearch('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+                >
                   <XMarkIcon className="w-4 h-4" />
                 </button>
               )}
             </div>
 
-            {/* Type filter */}
-            <div className="flex gap-1 bg-gray-100 rounded-lg p-1 shrink-0">
-              {(['all', 'income', 'expense'] as FilterType[]).map(f => (
-                <button key={f} onClick={() => { setTxFilter(f); setCategoryFilter('all'); }}
-                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition ${
-                    txFilter === f ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700'
-                  }`}>
-                  {f === 'all' ? 'Semua' : f === 'income' ? 'Masuk' : 'Keluar'}
-                </button>
-              ))}
-            </div>
+            {/* Type filter Dropdown */}
+            <select
+              value={txFilter}
+              onChange={(e) => { 
+                setTxFilter(e.target.value as FilterType); 
+                setCategoryFilter('all'); 
+              }}
+              className="bg-white border border-gray-300 rounded-lg text-sm px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 font-medium cursor-pointer"
+            >
+              <option value="all">Semua Aliran</option>
+              <option value="income">🟢 Masuk</option>
+              <option value="expense">🔴 Keluar</option>
+            </select>
 
-            {/* Payment Method filter */}
-            <div className="flex gap-1 bg-gray-100 rounded-lg p-1 shrink-0">
-              {(['all', 'qr', 'cash'] as (PaymentMethod | 'all')[]).map(m => (
-                <button key={m} onClick={() => setPaymentMethod(m)}
-                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition ${
-                    paymentMethod === m ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700'
-                  }`}>
-                  {m === 'all' ? 'Semua' : m === 'qr' ? '📱 QR' : '💵 Tunai'}
-                </button>
-              ))}
-            </div>
+            {/* Payment Method filter Dropdown */}
+            <select
+              value={paymentMethod}
+              onChange={(e) => setPaymentMethod(e.target.value as PaymentMethod | 'all')}
+              className="bg-white border border-gray-300 rounded-lg text-sm px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 font-medium cursor-pointer"
+            >
+              <option value="all">Semua Kaedah</option>
+              <option value="qr">📱 QR</option>
+              <option value="cash">💵 Tunai</option>
+            </select>
 
             {/* Category filter dropdown */}
-            <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}
-              className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-xs font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 shrink-0">
-              <option value="all">Semua Kategori</option>
+            {/* Category filter dropdown - Smart Dynamic Grouping */}
+            <select 
+              value={categoryFilter} 
+              onChange={e => setCategoryFilter(e.target.value)}
+              style={{ minWidth: '160px' }}
+              className="px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 font-medium cursor-pointer"
+            >
+              <option value="all">📁 Semua Kategori</option>
+              
               {txFilter === 'all' ? (
                 <>
-                  {TX_CATEGORIES.income.map(cat => <option key={`income-${cat}`} value={cat}>{cat} (Masuk)</option>)}
-                  {TX_CATEGORIES.expense.map(cat => <option key={`expense-${cat}`} value={cat}>{cat} (Keluar)</option>)}
+                  {/* Render Grouped Sections when 'Semua Aliran' is selected */}
+                  <optgroup label="🟢 KUTIPAN / MASUK" className="text-xs font-bold text-gray-400 mt-1">
+                    {TX_CATEGORIES.income.map(cat => (
+                      <option key={`income-${cat}`} value={cat} className="text-gray-700 font-normal">
+                        {cat}
+                      </option>
+                    ))}
+                  </optgroup>
+                  
+                  <optgroup label="🔴 PERBELANJAAN / KELUAR" className="text-xs font-bold text-gray-400 mt-2">
+                    {TX_CATEGORIES.expense.map(cat => (
+                      <option key={`expense-${cat}`} value={cat} className="text-gray-700 font-normal">
+                        {cat}
+                      </option>
+                    ))}
+                  </optgroup>
                 </>
               ) : (
-                TX_CATEGORIES[txFilter].map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))
+                <>
+                  {/* Clean isolated view when filtering by specifically Masuk or Keluar */}
+                  <optgroup 
+                    label={txFilter === 'income' ? "🟢 KUTIPAN MASUK" : "🔴 PERBELANJAAN KELUAR"} 
+                    className="text-xs font-bold text-gray-400 mt-1"
+                  >
+                    {TX_CATEGORIES[txFilter].map(cat => (
+                      <option key={cat} value={cat} className="text-gray-700 font-normal">
+                        {cat}
+                      </option>
+                    ))}
+                  </optgroup>
+                </>
               )}
             </select>
 
@@ -553,12 +609,12 @@ const FinanceManager = () => {
               </table>
             )}
           </div>
-        </>
+        </div>
       )}
 
       {/* ── Tabung tab ───────────────────────────────────────────────────────── */}
       {activeTab === 'tabung' && (
-        <>
+        <div className="w-full bg-white border border-gray-100 rounded-xl p-6 shadow-sm mt-4 min-h-[350px]">
           <div className="flex justify-end mb-4">
             <button onClick={openAddTabung}
               className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold text-sm">
@@ -569,25 +625,29 @@ const FinanceManager = () => {
           {tabungLoading ? (
             <div className="p-8 text-center text-gray-400">Memuatkan...</div>
           ) : tabungList.length === 0 ? (
-            <div className="p-8 text-center text-gray-400">
+            <div className="p-12 text-center text-gray-400 border border-dashed border-gray-200 rounded-xl bg-gray-50/50 w-full flex flex-col items-center justify-center min-h-[200px]">
               <p className="text-3xl mb-2">🏦</p>
-              <p>Tiada tabung lagi. Cipta tabung pertama!</p>
+              <p className="text-sm font-medium text-gray-500">Tiada tabung lagi. Cipta tabung pertama!</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="space-y-4 w-full">
               {tabungList.map(t => (
-                <TabungCard key={t.id} tabung={t}
-                  onEdit={() => openEditTabung(t)}
-                  onDelete={() => setDeleteModal({ show: true, id: t.id, target: 'tabung' })} />
+                <div key={t.id} className="w-full">
+                  <TabungCard tabung={t}
+                    onEdit={() => openEditTabung(t)}
+                    onDelete={() => setDeleteModal({ show: true, id: t.id, target: 'tabung' })} />
+                </div>
               ))}
             </div>
           )}
-        </>
+        </div>
       )}
 
       {/* ── Charts tab ───────────────────────────────────────────────────────── */}
       {activeTab === 'charts' && (
-        <FinanceCharts transactions={transactions} />
+        <div className="w-full bg-white border border-gray-100 rounded-xl p-6 shadow-sm mt-4 min-h-[350px]">
+          <FinanceCharts transactions={transactions} />
+        </div>
       )}
 
       {/* ── Transaction Modal ─────────────────────────────────────────────────── */}

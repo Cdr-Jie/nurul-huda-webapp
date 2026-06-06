@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import { authClient } from '../lib/auth-client';
+import { useNavigate } from 'react-router-dom';
 import {
+  ArrowLeftIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
+
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -84,6 +87,7 @@ const EventCalendar = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const navigate = useNavigate();
 
   // ─── Session ────────────────────────────────────────────────────────────────────
   const { data: session } = authClient.useSession();
@@ -194,23 +198,41 @@ const EventCalendar = () => {
   // ─── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div className="p-4 max-w-6xl mx-auto pb-20 text-left">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="text-left">
-          <h1 className="text-2xl font-bold text-gray-900">Kalendar Acara</h1>
-          <p className="text-gray-500 text-sm">Lihat semua acara dalam format kalendar</p>
+    <div className="min-h-screen bg-gray-50 p-4 pt-8 pb-20 max-w-7xl mx-auto w-full">
+      
+      {/* CONSISTENT HEADER GRID*/}
+      <header className="mb-8 grid grid-cols-3 w-full px-2">
+        
+        {/* 1. Left: Back Navigation */}
+        <div className="flex justify-start items-start pt-2">
+          <button
+            onClick={() => navigate('/admin/events')} // Adjust path to match exact events route
+            className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-blue-600 transition-colors group"
+          >
+            <ArrowLeftIcon className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            <span>Kembali ke Pungurusan Acara</span>
+          </button>
         </div>
-        <a
-          href="/admin/events"
-          className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold text-sm"
-        >
-          Kembali ke Pengurusan Acara
-        </a>
-      </div>
+
+        {/* 2. Center: Centered Title */}
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+            Kalendar Acara
+          </h1>
+          <p className="text-xs text-gray-400 mt-1 hidden sm:block">
+            Lihat semua acara dalam format kalendar
+          </p>
+        </div>
+
+        {/* 3. Right: Empty Spacer (Balances the 3-column flex/grid math) */}
+        <div className="flex justify-end invisible pointer-events-none">
+          <div className="w-4 h-4" />
+        </div>
+
+      </header>
 
       {/* Calendar Container */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-200">
         {loading ? (
           <div className="p-8 text-center text-gray-400">Memuatkan...</div>
         ) : (
