@@ -112,7 +112,7 @@ const HomePage: React.FC = () => {
               <ul className="space-y-2 text-gray-400 text-sm">
                 <li><a href="/" className="hover:text-white">Utama</a></li>
                 <li><a href="/sejarah" className="hover:text-white">Sejarah</a></li>
-                <li><a href="/carta" className="hover:text-white">Organisasi</a></li>
+                {/* <li><a href="/carta" className="hover:text-white">Organisasi</a></li> */}
               </ul>
             </div>
 
