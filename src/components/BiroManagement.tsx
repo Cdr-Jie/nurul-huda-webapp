@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
+import { authClient } from '../lib/auth-client';
 import {
   PlusIcon, PencilSquareIcon, TrashIcon,
   XMarkIcon, ExclamationTriangleIcon, UserGroupIcon,
@@ -185,8 +186,21 @@ const BiroDetail = ({
 };
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-
 const BiroManagement = () => {
+  const { data: session } = authClient.useSession();
+  const userRole = (session?.user as any)?.role ?? 'user';
+
+  // Hard guard — component refuses to render for non-superadmins
+  // even if somehow mounted directly
+  if (userRole !== 'superadmin') {
+    return (
+      <div className="p-8 text-center text-gray-500">
+        <p className="text-4xl mb-2">🚫</p>
+        <p className="font-semibold text-gray-700">Akses Ditolak</p>
+        <p className="text-sm mt-1">Hanya superadmin boleh mengurus biro.</p>
+      </div>
+    );
+  }
   const [biros, setBiros]               = useState<Biro[]>([]);
   const [loading, setLoading]           = useState(true);
   const [search, setSearch]             = useState('');

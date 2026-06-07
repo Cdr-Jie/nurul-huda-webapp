@@ -12,6 +12,10 @@ interface AuthActionButtonProps {
   onLogout: () => void;
 }
 
+interface NavItem {
+  name: string;
+  href: string;
+}
 // ─── Single Auth Button (shared across mobile & desktop) ──────────────────────
 
 const AuthActionButton = ({ isMobile, isPending, isLoggedIn, onLogout }: AuthActionButtonProps) => {
@@ -65,17 +69,15 @@ const Navbar = () => {
     }
   };
 
-  const navItems = [
-    { name: "Home", href: "/" },
-    // { name: "Carta Organisasi", href: "/carta" },
-    { name: "Sejarah Masjid", href: "/sejarah" },
-    // Only add this if the user is logged in
-    ...(session?.user ? [
-      { name: "Urus Profil", href: "/settings" },
-      { name: "Pengurusan", href: "/admin" }
-    ] : []),
+  const navItems: NavItem[] = [
+    { name: 'Home',             href: '/' },
+    { name: 'Sejarah Masjid',   href: '/sejarah' },
+    { name: 'Urus Profil',            href: '/settings' },
+    ...(['admin', 'financeadmin', 'superadmin'].includes(session?.user?.role ?? '')
+      ? [{ name: 'Pengurusan', href: '/admin' }]
+      : []),
   ];
-
+  
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

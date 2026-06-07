@@ -74,7 +74,7 @@ const SettingsManagement = () => {
   const fileInputRef                      = useRef<HTMLInputElement>(null);
 
   // Profile form
-  const [profileForm, setProfileForm]     = useState({ name: '', email: '', phone: '', position: '', biro_id: '' });
+  const [profileForm, setProfileForm]     = useState({ name: '', phone: '', position: '', biro_id: '' });
   const [profileSaving, setProfileSaving] = useState(false);
   const [imageFile, setImageFile]         = useState<File | null>(null);
   const [imagePreview, setImagePreview]   = useState<string | null>(null);
@@ -96,7 +96,6 @@ const SettingsManagement = () => {
     if (user) {
       setProfileForm({
         name:     user.name     ?? '',
-        email:    user.email    ?? '',
         phone:    user.phone    ?? '',
         position: user.position ?? '',
         biro_id:  user.biro_id  ?? '',
@@ -189,21 +188,6 @@ const SettingsManagement = () => {
       }
     })();
   };
-
-  // ── Change email ───────────────────────────────────────────────────────────
-
-  const handleChangeEmail = async () => {
-    if (!profileForm.email.trim() || profileForm.email === user.email) return;
-    setProfileSaving(true);
-    try {
-      const { error } = await authClient.changeEmail({ newEmail: profileForm.email.trim() });
-      if (error) showToast(error.message ?? 'Gagal menukar e-mel.', 'error');
-      else showToast('E-mel pengesahan dihantar. Sila semak e-mel anda.', 'success');
-    } finally {
-      setProfileSaving(false);
-    }
-  };
-
   // ── Change password ────────────────────────────────────────────────────────
 
   const handleChangePassword = async (e: React.FormEvent) => {
@@ -349,16 +333,10 @@ const SettingsManagement = () => {
             </div>
 
             <Field label="Biro">
-              <select
-                className={inputCls}
-                value={profileForm.biro_id}
-                onChange={e => setProfileForm(f => ({ ...f, biro_id: e.target.value }))}
-              >
-                <option value="">— Tiada Biro —</option>
-                {biroList.map(b => (
-                  <option key={b.id} value={b.id}>{b.name}</option>
-                ))}
-              </select>
+                <div className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-500 flex items-center justify-between">
+                    <span>{biroList.find(b => b.id === profileForm.biro_id)?.name ?? '— Tiada Biro —'}</span>
+                    <span className="text-xs text-gray-400 ml-2">Ditetapkan oleh superadmin</span>
+                </div>
             </Field>
 
             <button
@@ -371,33 +349,6 @@ const SettingsManagement = () => {
           </div>
         </Card>
       </form>
-
-      {/* ── Card 2: Email ────────────────────────────────────────────────────── */}
-      <Card title="Alamat E-mel" subtitle="Tukar e-mel — e-mel pengesahan akan dihantar">
-        <div className="space-y-4">
-          <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg">
-            <p className="text-xs text-gray-500 mb-0.5">E-mel semasa</p>
-            <p className="text-sm font-semibold text-gray-800">{user.email}</p>
-          </div>
-          <Field label="E-mel Baharu">
-            <input
-              type="email"
-              className={inputCls}
-              placeholder="contoh@email.com"
-              value={profileForm.email === user.email ? '' : profileForm.email}
-              onChange={e => setProfileForm(f => ({ ...f, email: e.target.value }))}
-            />
-          </Field>
-          <button
-            type="button"
-            disabled={profileSaving || !profileForm.email.trim() || profileForm.email === user.email}
-            onClick={handleChangeEmail}
-            className="w-full py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-60 transition"
-          >
-            Hantar E-mel Pengesahan
-          </button>
-        </div>
-      </Card>
 
       {/* ── Card 3: Password ─────────────────────────────────────────────────── */}
       <form onSubmit={handleChangePassword}>

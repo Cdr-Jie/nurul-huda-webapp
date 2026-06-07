@@ -38,6 +38,11 @@ interface Event {
   biro_id: string | null;
 }
 
+interface Biro {
+  id: string;
+  name: string;
+}
+
 type EventFormData = Omit<Event, 'id' | 'created_at'>;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -50,7 +55,6 @@ function formatDate(iso: string): string {
   const [y, m, d] = iso.split('-').map(Number);
   return `${d} ${MONTHS[m]} ${y}`;
 }
-
 // ─── Field wrapper ────────────────────────────────────────────────────────────
 
 const Field = ({
@@ -161,6 +165,7 @@ const EventsManager = () => {
   const [letterFile, setLetterFile] = useState<File | null>(null);
 
   const [deleteModal, setDeleteModal] = useState<{ show: boolean; id: string | null }>({ show: false, id: null });
+  const [biroList, setBiroList] = useState<Biro[]>([]);
 
   // ── Search filter ───────────────────────────────────────────────────────────
   // Searches across title, organizer, and date — all client-side, no extra fetches
@@ -247,6 +252,18 @@ const EventsManager = () => {
     if (session !== undefined) fetchEvents();
   }, [session]);
 
+  // ── Fetch biro list ─────────────────────────────────────────────────────────
+  useEffect(() => {
+    const fetchBiro = async () => {
+      const { data } = await supabase
+        .from('biro')
+        .select('id, name')
+        .order('name', { ascending: true });
+      setBiroList(data ?? []);
+    };
+    fetchBiro();
+  }, []);
+
   // ── Modal helpers ───────────────────────────────────────────────────────────
 
   const openAdd = () => {
@@ -275,6 +292,23 @@ const EventsManager = () => {
   };
 
   const closeModal = () => setModal({ open: false, editing: null });
+
+  // ── Add this helper function inside the component ──────────────────────────
+  const handleToggleActive = async (event: Event) => {
+    const newStatus = !event.is_active;
+    // Optimistic update
+    setEvents(prev => prev.map(e => e.id === event.id ? { ...e, is_active: newStatus } : e));
+    // Save to Supabase
+    const { error } = await supabase
+      .from('events')
+      .update({ is_active: newStatus })
+      .eq('id', event.id);
+    // Revert if failed
+    if (error) {
+      console.error('Toggle error:', error);
+      setEvents(prev => prev.map(e => e.id === event.id ? { ...e, is_active: !newStatus } : e));
+    }
+  };
 
   // ── File upload ─────────────────────────────────────────────────────────────
 
@@ -498,6 +532,9 @@ const EventsManager = () => {
                 <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell cursor-pointer hover:bg-gray-100 transition" onClick={() => handleSort('organizer')}>
                   <div className="flex items-center gap-2">Penganjur {getSortIcon('organizer')}</div>
                 </th>
+                <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden lg:table-cell">
+                  Biro
+                </th>
                 <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Surat</th>
                 <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell cursor-pointer hover:bg-gray-100 transition" onClick={() => handleSort('status')}>
                   <div className="flex items-center gap-2">Status {getSortIcon('status')}</div>
@@ -524,13 +561,7 @@ const EventsManager = () => {
                           <div>{formatDate(event.date)} · {event.organizer}</div>
                           <div className="flex items-center gap-2">
                             <button
-                              onClick={() => {
-                                setEvents(prevEvents => 
-                                  prevEvents.map(e => 
-                                    e.id === event.id ? { ...e, is_active: !e.is_active } : e
-                                  )
-                                );
-                              }}
+                              onClick={() => handleToggleActive(event)}
                               className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-200 ${
                                 event.is_active 
                                   ? 'bg-green-100 text-green-700 hover:bg-green-200' 
@@ -552,6 +583,9 @@ const EventsManager = () => {
                   </td>
                   <td className="p-4 text-sm text-gray-600 hidden md:table-cell">{formatDate(event.date)}</td>
                   <td className="p-4 text-sm text-gray-600 hidden md:table-cell">{event.organizer}</td>
+                  <td className="p-4 text-sm text-gray-600 hidden lg:table-cell">
+                    {biroList.find(b => b.id === event.biro_id)?.name ?? '—'}
+                  </td>
                   <td className="p-4 hidden md:table-cell">
                     {event.host_letter_url ? (
                       <a href={event.host_letter_url} target="_blank" rel="noreferrer"
@@ -631,6 +665,27 @@ const EventsManager = () => {
                 <textarea className={`${inputCls} resize-none`} rows={3}
                   placeholder="Huraian ringkas acara..."
                   value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
+              </Field>
+
+              {/* Biro in charge */}
+              <Field label="Biro Bertanggungjawab">
+                {isSuperAdmin ? (
+                  <select
+                    className={inputCls}
+                    value={form.biro_id ?? ''}
+                    onChange={e => setForm(f => ({ ...f, biro_id: e.target.value || null }))}
+                  >
+                    <option value="">— Tiada Biro —</option>
+                    {biroList.map(b => (
+                      <option key={b.id} value={b.id}>{b.name}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <div className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-500 flex items-center justify-between">
+                    <span>{biroList.find(b => b.id === form.biro_id)?.name ?? '— Tiada Biro —'}</span>
+                    <span className="text-xs text-gray-400 ml-2">Hanya superadmin boleh ubah</span>
+                  </div>
+                )}
               </Field>
 
               <Field label="Gambar Acara">

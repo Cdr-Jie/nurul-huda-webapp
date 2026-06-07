@@ -143,6 +143,7 @@ const AssetManager = () => {
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   const [availabilityFilter, setAvailabilityFilter] = useState<'all' | 'available' | 'unavailable'>('all');
   const [sortBy, setSortBy]               = useState<{ column: string; ascending: boolean }>({ column: 'name', ascending: true });
+  const [biroList, setBiroList] = useState<{ id: string; name: string }[]>([]);
 
   // ── Modal state ──────────────────────────────────────────────────────────────
   const [modal, setModal]                 = useState<{ open: boolean; editing: Asset | null }>({ open: false, editing: null });
@@ -232,6 +233,15 @@ const assetsWithCounts = await Promise.all(
     else { setInstances(data ?? []); }
     setLoadingInstances(false);
   };
+
+  useEffect(() => {
+    const fetchBiro = async () => {
+      const { data } = await supabase.from('biro').select('id, name').order('name');
+      setBiroList(data ?? []);
+    };
+    fetchBiro();
+  }, []);
+
 
   useEffect(() => {
     if (session !== undefined && isAdmin) fetchAssets();
@@ -395,12 +405,14 @@ const assetsWithCounts = await Promise.all(
 
   const exportToExcel = () => {
     const rows = filteredAssets.map(asset => ({
-      Nama:        asset.name,
-      Kategori:    asset.category,
+      Nama:          asset.name,
+      Kategori:      asset.category,
       'Jumlah Unit': asset.total_quantity,
-      Tersedia:    asset.available_count ?? 0,
-      Keadaan:     CONDITION_COLORS[asset.default_condition].label,
-      Penerangan:  asset.description ?? '',
+      Tersedia:      asset.available_count ?? 0,
+      Keadaan:       CONDITION_COLORS[asset.default_condition].label,
+      // 🌟 Add this line to include Biro in your Excel downloads:
+      Biro:          biroList.find(b => b.id === asset.biro_id)?.name ?? 'Umum/Tiada',
+      Penerangan:    asset.description ?? '',
     }));
     const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
@@ -412,10 +424,12 @@ const assetsWithCounts = await Promise.all(
 
   if (!isAdmin) {
     return (
-      <div className="p-4 text-center text-gray-500 mt-20">
-        Anda tidak mempunyai akses ke halaman ini.
-      </div>
-    );
+    <div className="p-4 text-center text-gray-500 mt-20">
+      <p className="text-4xl mb-2">🚫</p>
+      <p className="font-semibold text-gray-700">Akses Ditolak</p>
+      <p className="text-sm mt-1">Anda tidak mempunyai akses ke halaman ini.</p>
+    </div>
+  );
   }
 
   // ─── Render ───────────────────────────────────────────────────────────────────
@@ -584,6 +598,7 @@ const assetsWithCounts = await Promise.all(
                     <div className="flex items-center gap-2">Keadaan {getSortIcon('default_condition')}</div>
                   </th>
                   <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Tersedia</th>
+                  <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden lg:table-cell">Biro</th>
                   <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide text-right">Tindakan</th>
                 </tr>
               </thead>
@@ -605,6 +620,12 @@ const assetsWithCounts = await Promise.all(
                           <div className="md:hidden text-xs text-gray-500">
                             {asset.category} · {asset.available_count ?? 0}/{asset.total_quantity} tersedia
                           </div>
+                          {asset.biro_id && (
+                              <div className="text-[11px] font-medium text-gray-400">
+                                <span className="font-semibold text-gray-500">Biro:</span>{' '}
+                                {biroList.find(b => b.id === asset.biro_id)?.name ?? '—'}
+                              </div>
+                            )}
                         </div>
                       </div>
                     </td>
@@ -619,6 +640,9 @@ const assetsWithCounts = await Promise.all(
                       <span className={`text-sm font-semibold ${(asset.available_count ?? 0) > 0 ? 'text-green-600' : 'text-red-600'}`}>
                         {asset.available_count ?? 0} / {asset.total_quantity}
                       </span>
+                    </td>
+                    <td className="p-4 text-sm text-gray-600 hidden lg:table-cell">
+                      {biroList.find(b => b.id === asset.biro_id)?.name ?? '—'}
                     </td>
                     <td className="p-4 text-right">
                       <div className="flex justify-end gap-1">
@@ -671,6 +695,26 @@ const assetsWithCounts = await Promise.all(
                   </select>
                 </Field>
               </div>
+
+              <Field label="Biro Bertanggungjawab">
+                {isSuperAdmin ? (
+                  <select
+                    className={inputCls}
+                    value={form.biro_id ?? ''}
+                    onChange={e => setForm(f => ({ ...f, biro_id: e.target.value || null }))}
+                  >
+                    <option value="">— Tiada Biro —</option>
+                    {biroList.map(b => (
+                      <option key={b.id} value={b.id}>{b.name}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <div className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-500 flex items-center justify-between">
+                    <span>{biroList.find(b => b.id === form.biro_id)?.name ?? '— Tiada Biro —'}</span>
+                    <span className="text-xs text-gray-400 ml-2">Hanya superadmin boleh ubah</span>
+                  </div>
+                )}
+              </Field>
 
               <Field label="Penerangan">
                 <textarea className={`${inputCls} resize-none`} rows={3}
