@@ -70,7 +70,10 @@ const Navbar = () => {
     // { name: "Carta Organisasi", href: "/carta" },
     { name: "Sejarah Masjid", href: "/sejarah" },
     // Only add this if the user is logged in
-    ...(session?.user ? [{ name: "Pengurusan", href: "/admin" }] : []),
+    ...(session?.user ? [
+      { name: "Urus Profil", href: "/settings" },
+      { name: "Pengurusan", href: "/admin" }
+    ] : []),
   ];
 
   return (

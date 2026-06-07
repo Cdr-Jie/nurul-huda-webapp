@@ -204,7 +204,7 @@ export default function UserRow({
         </td>
 
         {/* Biro */}
-        <td className="px-4 py-3 text-center text-sm text-gray-600 hidden md:table-cell">
+        <td className="px-4 py-3 text-center text-sm text-gray-600 hidden sm:table-cell">
           {biroName}
         </td>
 

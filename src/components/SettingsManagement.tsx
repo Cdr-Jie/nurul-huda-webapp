@@ -47,67 +47,69 @@ const SettingsManagement = () => {
 
 
   if (!session) {
-    return <div className="p-8 text-center text-gray-500">Loading settings...</div>;
+    return <div className="p-8 text-center text-gray-500">Memuatkan tetapan...</div>;
   }
 
   return (
     <div className="space-y-6">
       {/* CARD 1: Profile Info (Read-Only Context) */}
-      <div className="bg-white border border-gray-300 rounded-md shadow-sm overflow-hidden">
+      <div className="bg-white border border-gray-300 rounded-lg shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-          <h3 className="text-base font-semibold text-gray-900">Profile Information</h3>
+          <h3 className="text-base font-semibold text-gray-900">Maklumat Profil</h3>
         </div>
         <div className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl font-bold">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+            <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl font-bold shrink-0">
               {session.user.name?.charAt(0).toUpperCase() || session.user.email.charAt(0).toUpperCase()}
             </div>
-            <div>
-              <p className="text-sm font-medium text-gray-900">{session.user.name || "No name set"}</p>
+            <div className="text-center sm:text-left">
+              <p className="text-sm font-medium text-gray-900">{session.user.name || "Tiada nama ditetapkan"}</p>
               <p className="text-sm text-gray-500">{session.user.email}</p>
-              <p className="text-xs text-gray-400 mt-1">Role: <span className="uppercase">{session.user.role || "user"}</span></p>
+              <p className="text-xs text-gray-400 mt-1">Peranan: <span className="font-medium">{session.user.role === 'superadmin' ? 'Superadmin' : session.user.role === 'admin' ? 'Admin' : session.user.role === 'financeadmin' ? 'Admin Kewangan' : 'Pengguna'}</span></p>
             </div>
           </div>
         </div>
       </div>
 
       {/* CARD 2: Security & Passwords */}
-      <div className="bg-white border border-gray-300 rounded-md shadow-sm overflow-hidden">
+      <div className="bg-white border border-gray-300 rounded-lg shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-          <h3 className="text-base font-semibold text-gray-900">Security</h3>
-          <p className="text-sm text-gray-500 mt-1">Update your password or configure modern authentication.</p>
+          <h3 className="text-base font-semibold text-gray-900">Keselamatan</h3>
+          <p className="text-sm text-gray-500 mt-1">Kemas kini kata laluan atau konfigurasikan pengesahan moden.</p>
         </div>
         
         <div className="p-6 space-y-8">
           {/* Change Password Form */}
-          <form onSubmit={handlePasswordChange} className="space-y-4 max-w-md">
-            <h4 className="text-sm font-medium text-gray-900">Change Password</h4>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
-              <input
-                type="password"
-                required
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
-              <input
-                type="password"
-                required
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+          <form onSubmit={handlePasswordChange} className="space-y-4">
+            <h4 className="text-sm font-medium text-gray-900">Tukar Kata Laluan</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Kata Laluan Semasa</label>
+                <input
+                  type="password"
+                  required
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Kata Laluan Baru</label>
+                <input
+                  type="password"
+                  required
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
             </div>
             <button
               type="submit"
               disabled={isChangingPassword}
-              className="px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {isChangingPassword ? "Updating..." : "Update Password"}
+              {isChangingPassword ? "Mengemas kini..." : "Kemas kini Kata Laluan"}
             </button>
           </form>
 
@@ -115,34 +117,33 @@ const SettingsManagement = () => {
 
           {/* Passkey Setup */}
           <div>
-            <h4 className="text-sm font-medium text-gray-900">Passkeys</h4>
+            <h4 className="text-sm font-medium text-gray-900">Kunci Akses</h4>
             <p className="text-sm text-gray-500 mt-1 mb-4">
-              Use your device's fingerprint, face scan, or screen lock to sign in securely without a password.
+              Gunakan cap jari, pengimbas wajah, atau kunci skrin peranti anda untuk log masuk dengan selamat tanpa kata laluan.
             </p>
             <button
-              
               type="button"
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
               </svg>
-              Register New Passkey
+              Daftar Kunci Akses Baru
             </button>
           </div>
         </div>
       </div>
 
       {/* CARD 3: Social Connections */}
-      <div className="bg-white border border-gray-300 rounded-md shadow-sm overflow-hidden">
+      <div className="bg-white border border-gray-300 rounded-lg shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-          <h3 className="text-base font-semibold text-gray-900">Connected Accounts</h3>
-          <p className="text-sm text-gray-500 mt-1">Link your social accounts to log in quickly.</p>
+          <h3 className="text-base font-semibold text-gray-900">Akaun Bersambung</h3>
+          <p className="text-sm text-gray-500 mt-1">Sambungkan akaun media sosial anda untuk log masuk dengan cepat.</p>
         </div>
-        <div className="p-6 flex flex-col sm:flex-row gap-4">
+        <div className="p-6 flex flex-col sm:flex-row gap-3">
           <button
             onClick={() => handleLinkSocial('google')}
-            className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors w-full sm:w-auto"
+            className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors flex-1 sm:flex-none"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -150,37 +151,37 @@ const SettingsManagement = () => {
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
             </svg>
-            Link Google
+            Sambung Google
           </button>
 
           <button
             onClick={() => handleLinkSocial('facebook')}
-            className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors w-full sm:w-auto"
+            className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors flex-1 sm:flex-none"
           >
             <svg className="w-4 h-4" fill="#1877F2" viewBox="0 0 24 24">
               <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
             </svg>
-            Link Facebook
+            Sambung Facebook
           </button>
         </div>
       </div>
 
       {/* CARD 4: Danger Zone */}
-      <div className="border border-red-300 rounded-md shadow-sm overflow-hidden mb-8">
+      <div className="border border-red-300 rounded-lg shadow-sm overflow-hidden mb-8">
         <div className="px-6 py-4 border-b border-red-200 bg-red-50">
-          <h3 className="text-base font-semibold text-red-800">Danger Zone</h3>
+          <h3 className="text-base font-semibold text-red-800">Zon Bahaya</h3>
         </div>
         <div className="p-6 bg-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h4 className="text-sm font-medium text-gray-900">Delete Account</h4>
+            <h4 className="text-sm font-medium text-gray-900">Padam Akaun</h4>
             <p className="text-sm text-gray-500 mt-1">
-              Permanently remove your account and all associated data. This action cannot be undone.
+              Buang akaun anda secara kekal dan semua data yang berkaitan. Tindakan ini tidak boleh dibuat asal.
             </p>
           </div>
           <button
             className="px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-300 rounded-md hover:bg-red-50 disabled:opacity-50 transition-colors whitespace-nowrap"
           >
-            {"Delete Account"}
+            Padam Akaun
           </button>
         </div>
       </div>

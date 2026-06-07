@@ -180,7 +180,7 @@ const UserManagement = () => {
               <tr className="bg-gray-50 border-b border-gray-300 text-gray-600 font-medium">
                 <th className="px-4 py-3 text-left">Pengguna</th>
                 <th className="px-4 py-3 text-center hidden sm:table-cell">Peranan</th>
-                <th className="px-4 py-3 text-center hidden md:table-cell">Biro</th>
+                <th className="px-4 py-3 text-center hidden sm:table-cell">Biro</th>
                 <th className="px-4 py-3 text-center hidden md:table-cell">Jawatan</th>
                 <th className="px-4 py-3 text-center hidden lg:table-cell">Didaftar</th>
                 <th className="px-4 py-3 text-center">Tindakan</th>

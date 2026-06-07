@@ -69,7 +69,24 @@ const EventsSection: React.FC = () => {
         }
 
         const data = await response.json();
-        setEvents(data ?? []);
+        
+        // Filter and sort events
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Start of today
+        
+        const upcomingEvents = (data ?? [])
+          .filter(event => {
+            const eventDate = new Date(event.date);
+            return eventDate >= today; // Only events on or after today
+          })
+          .sort((a, b) => {
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+            return dateA.getTime() - dateB.getTime(); // Nearest date first
+          })
+          .slice(0, 3); // Max 3 events
+        
+        setEvents(upcomingEvents);
       } catch (err) {
         console.error('Error fetching events:', err);
         setError('Gagal memuatkan acara. Sila cuba lagi.');

@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { authClient } from '../lib/auth-client';
 import {
   CalendarIcon,
   CubeIcon,
@@ -59,6 +60,16 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, onClick }) => {
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { data: session } = authClient.useSession();
+  const userRole = session?.user?.role ?? 'user';
+
+  // Filter modules: only show user management for superadmin
+  const visibleModules = MODULES.filter(module => {
+    if (module.link === '/admin/users' && userRole !== 'superadmin') {
+      return false;
+    }
+    return true;
+  });
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 pt-8 pb-20 max-w-7xl mx-auto w-full">
@@ -69,7 +80,7 @@ const AdminDashboard: React.FC = () => {
         Desktop: 5 columns
       */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        {MODULES.map((module) => (
+        {visibleModules.map((module) => (
           <ModuleCard
             key={module.link}
             module={module}
