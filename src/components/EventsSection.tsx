@@ -75,11 +75,11 @@ const EventsSection: React.FC = () => {
         today.setHours(0, 0, 0, 0); // Start of today
         
         const upcomingEvents = (data ?? [])
-          .filter(event => {
+          .filter((event: Event) => {
             const eventDate = new Date(event.date);
             return eventDate >= today; // Only events on or after today
           })
-          .sort((a, b) => {
+          .sort((a: Event, b: Event) => {
             const dateA = new Date(a.date);
             const dateB = new Date(b.date);
             return dateA.getTime() - dateB.getTime(); // Nearest date first
