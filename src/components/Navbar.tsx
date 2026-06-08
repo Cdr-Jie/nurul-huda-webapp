@@ -72,7 +72,9 @@ const Navbar = () => {
   const navItems: NavItem[] = [
     { name: 'Home',             href: '/' },
     { name: 'Sejarah Masjid',   href: '/sejarah' },
-    { name: 'Urus Profil',            href: '/settings' },
+    ...(session?.user 
+        ? [{ name: 'Urus Profil', href: '/settings' }] 
+        : []),    
     ...(['admin', 'financeadmin', 'superadmin'].includes(session?.user?.role ?? '')
       ? [{ name: 'Pengurusan', href: '/admin' }]
       : []),
