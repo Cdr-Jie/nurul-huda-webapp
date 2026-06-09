@@ -6,6 +6,7 @@ import {
   MegaphoneIcon,
   PhotoIcon,
   ArrowRightStartOnRectangleIcon,
+  BuildingOfficeIcon,
 } from '@heroicons/react/24/outline';
 import { supabase } from '../supabaseClient';
 
@@ -23,6 +24,7 @@ interface Module {
 const MODULES: Module[] = [
   { name: 'Acara Majlis',    icon: CalendarIcon,              color: 'bg-blue-500',    link: '/admin/events'       },
   { name: 'Pengurusan Ahli', icon: UsersIcon,                 color: 'bg-emerald-500', link: '/admin/users'         },
+  { name: 'Pengurusan Biro', icon: BuildingOfficeIcon,        color: 'bg-indigo-500',  link: '/admin/biro'          },
   { name: 'Kewangan/Tabung', icon: BanknotesIcon,             color: 'bg-amber-500',   link: '/admin/finance'       },
   { name: 'Pengumuman',      icon: MegaphoneIcon,             color: 'bg-purple-500',  link: '/admin/announcements' },
   { name: 'Galeri & Media',  icon: PhotoIcon,                 color: 'bg-rose-500',    link: '/admin/gallery'       },

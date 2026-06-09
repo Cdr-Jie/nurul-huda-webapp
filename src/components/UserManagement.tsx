@@ -5,16 +5,15 @@ import { Link } from "react-router-dom";
 import { 
   MagnifyingGlassIcon, 
   XMarkIcon, 
-  ChevronLeftIcon 
+  ChevronLeftIcon
 } from "@heroicons/react/24/outline";
 
 interface User {
   id: string;
   name: string;
   email: string;
-  role?: string;
-  createdAt?: string;
-  [key: string]: any;
+  role: string;
+  createdAt: string;
 }
 
 const UserManagement = () => {
@@ -53,7 +52,7 @@ const UserManagement = () => {
       });
       
       if (response.data) {
-        setUsers(response.data.users as User[]);
+        setUsers((response.data.users as unknown as User[]) || []);
         setTotalUsers(response.data.total);
       }
     } catch (error) {
@@ -61,11 +60,12 @@ const UserManagement = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [isSearching, pageSize, page]); 
+  }, [isSearching, pageSize, page]);
 
   useEffect(() => {
-    if (!isSessionPending && hasPermission) {
-      fetchUsers();
+    const shouldFetch = !isSessionPending && hasPermission;
+    if (shouldFetch) {
+      void fetchUsers();
     }
   }, [isSessionPending, hasPermission, fetchUsers]);
 
@@ -146,7 +146,6 @@ const UserManagement = () => {
 
   return (
     <div className="p-4 max-w-6xl mx-auto pb-20 text-left">
-      {/* Navigation Layer - Selaras dengan EventsManager */}
       <div className="w-full flex justify-start mb-2">
         <Link 
           to="/admin" 
@@ -157,15 +156,15 @@ const UserManagement = () => {
         </Link>
       </div>
 
-      {/* Header Content Layer - Selaras dengan EventsManager */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div className="text-left">
           <h1 className="text-2xl font-bold text-gray-900">Pengurusan Pengguna</h1>
           <p className="text-gray-500 text-sm">Uruskan akaun dan peranan pengguna masjid</p>
         </div>
+
+
       </div>
 
-      {/* Search Bar - Selaras dengan EventsManager */}
       <div className="relative mb-4">
         <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
         <input
@@ -186,7 +185,6 @@ const UserManagement = () => {
         )}
       </div>
 
-      {/* Result count when searching */}
       {searchQuery.trim() && (
         <p className="text-xs text-gray-500 mb-3">
           {filteredUsers.length === 0
@@ -195,7 +193,6 @@ const UserManagement = () => {
         </p>
       )}
 
-      {/* Table Container - Selaras dengan EventsManager */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
@@ -213,7 +210,6 @@ const UserManagement = () => {
           </table>
         </div>
 
-        {/* Server-Side Pagination */}
         {!isSearching && totalUsers > 0 && (
           <div className="bg-gray-50 border-t border-gray-200 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -257,6 +253,8 @@ const UserManagement = () => {
           </div>
         )}
       </div>
+
+
     </div>
   );
 };

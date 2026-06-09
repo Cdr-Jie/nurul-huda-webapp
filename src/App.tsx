@@ -12,6 +12,7 @@ import SettingsPage from './pages/SettingsPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminEventPage from './pages/admin/AdminEventPage';
 import UserEditPage from './pages/UserEditPage';
+import AdminBiroPage from './pages/admin/AdminBiroPage';
 
 // 1. Define the Impersonation Indicator inside App.tsx
 function ImpersonationIndicator() {
@@ -85,6 +86,7 @@ function App() {
         <Route path="/admin/events" element={session ? <AdminEventPage /> : <Navigate to ="/login" />} />
         <Route path="/admin/finance" element={session ? <FinancePage /> : <Navigate to ="/login" />} />
         <Route path="/admin/users" element={session ? <UserPage /> : <Navigate to ="/login" />} />
+        <Route path="/admin/biro" element={session ? <AdminBiroPage /> : <Navigate to ="/login" />} />
         <Route path="/settings" element={session ? <SettingsPage /> : <Navigate to ="/login" />} />
         <Route path="/login" element={session ? <Navigate to="/" /> : <LoginPage />} />
         <Route path="/signup" element={session ? <Navigate to="/" /> : <SignUpPage />} />

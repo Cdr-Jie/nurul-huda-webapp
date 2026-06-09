@@ -46,7 +46,7 @@ export const auth = betterAuth({
   //Extending core schema 
     user: {
       changeEmail: {
-        enabled: false,
+        enabled: true,
       },
       additionalFields: {
         phone: {

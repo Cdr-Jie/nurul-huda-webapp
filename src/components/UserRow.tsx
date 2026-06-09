@@ -9,7 +9,6 @@ type UserWithRole = {
   email: string;
   role: string;
   banned?: boolean;
-  emailVerified?: boolean;
   createdAt: Date | string;
 };
 
@@ -29,6 +28,23 @@ export default function UserRow({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const getRoleStyleClass = (role: string) => {
+    switch (role) {
+      case "admin":
+        return "bg-purple-100 text-purple-800 border-purple-200";
+      case "financeadmin":
+        return "bg-emerald-100 text-emerald-800 border-emerald-200";
+      case "superadmin":
+        return "bg-indigo-100 text-indigo-800 border-indigo-200";
+      default:
+        return "bg-slate-100 text-slate-800 border-slate-200";
+    }
+  };
+
+  const getRoleDisplayName = (role: string) => {
+    return role === "financeadmin" ? "Admin Kewangan" : role || "Pengguna";
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -57,10 +73,10 @@ export default function UserRow({
     await authClient.admin.impersonateUser(
       { userId: user.id },
       {
-        onError: (error: any) => showToast('error', error.error.message || "Gagal menyamar sebagai pengguna."),
+        onError: (error: { error?: { message?: string } }) => showToast('error', error.error?.message || "Gagal menyamar sebagai pengguna."),
         onSuccess: () => {
           setIsMenuOpen(false);
-          navigate("/"); // Redirect to home after impersonating
+          navigate("/");
         },
       }
     );
@@ -70,7 +86,7 @@ export default function UserRow({
     await authClient.admin.revokeUserSessions(
       { userId: user.id },
       {
-        onError: (error: any) => showToast('error', error.error.message || "Gagal membatalkan sesi pengguna."),
+        onError: (error: { error?: { message?: string } }) => showToast('error', error.error?.message || "Gagal membatalkan sesi pengguna."),
         onSuccess: () => {
           showToast('success', "Semua sesi pengguna telah dibatalkan.");
           setIsMenuOpen(false);
@@ -83,7 +99,7 @@ export default function UserRow({
     await authClient.admin.unbanUser(
       { userId: user.id },
       {
-        onError: (error: any) => showToast('error', error.error.message || "Gagal membatalkan larangan (unban)."),
+        onError: (error: { error?: { message?: string } }) => showToast('error', error.error?.message || "Gagal membatalkan larangan (unban)."),
         onSuccess: () => {
           showToast('success', "Akaun pengguna telah diaktifkan semula.");
           refetchUsers();
@@ -97,7 +113,7 @@ export default function UserRow({
     await authClient.admin.banUser(
       { userId: user.id },
       {
-        onError: (error: any) => showToast('error', error.error.message || "Gagal mengharamkan pengguna (ban)."),
+        onError: (error: { error?: { message?: string } }) => showToast('error', error.error?.message || "Gagal mengharamkan pengguna (ban)."),
         onSuccess: () => {
           showToast('success', "Akaun pengguna telah diharamkan.");
           refetchUsers();
@@ -111,7 +127,7 @@ export default function UserRow({
     await authClient.admin.removeUser(
       { userId: user.id },
       {
-        onError: (error: any) => showToast('error', error.error.message || "Gagal memadam pengguna."),
+        onError: (error: { error?: { message?: string } }) => showToast('error', error.error?.message || "Gagal memadam pengguna."),
         onSuccess: () => {
           showToast('success', "Pengguna berjaya dipadamkan.");
           setIsDeleteDialogOpen(false);
@@ -135,11 +151,6 @@ export default function UserRow({
                   Diharamkan
                 </span>
               )}
-              {user.emailVerified === false && (
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-slate-100 text-slate-800 border border-slate-200">
-                  Belum Disahkan
-                </span>
-              )}
               {isSelf && (
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-indigo-100 text-indigo-800 border border-indigo-200">
                   Anda
@@ -151,16 +162,8 @@ export default function UserRow({
 
         {/* Role Column */}
         <td className="px-6 py-4">
-          <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${
-            user.role === "admin" 
-              ? "bg-purple-100 text-purple-800 border-purple-200"
-              : user.role === "financeadmin"
-              ? "bg-emerald-100 text-emerald-800 border-emerald-200"
-              : user.role === "superadmin"
-              ? "bg-indigo-100 text-indigo-800 border-indigo-200"
-              : "bg-slate-100 text-slate-800 border-slate-200"
-          }`}>
-            {user.role === "financeadmin" ? "Admin Kewangan" : user.role || "Pengguna"}
+          <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${getRoleStyleClass(user.role)}`}>
+            {getRoleDisplayName(user.role)}
           </span>
         </td>
 

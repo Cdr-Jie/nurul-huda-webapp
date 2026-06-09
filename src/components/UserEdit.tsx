@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSession, authClient } from '../lib/auth-client';
+import { supabase } from '../supabaseClient';
+import { passwordSchema } from '../lib/validation';
 
-// 1. Defined strict types to satisfy TypeScript and replace 'any'
 type Role = "user" | "admin" | "financeadmin" | "superadmin";
 
 interface ExtendedUser {
@@ -14,10 +15,12 @@ interface ExtendedUser {
   biro_id?: string;
 }
 
-// Field Wrapper
-const Field = ({
-  label, required = false, children,
-}: { label: string; required?: boolean; children: React.ReactNode }) => (
+interface Biro {
+  id: string;
+  name: string;
+}
+
+const Field = ({ label, required = false, children }: { label: string; required?: boolean; children: React.ReactNode }) => (
   <div>
     <label className="block text-sm font-semibold text-gray-700 mb-1">
       {label}{required && <span className="text-red-500 ml-0.5">*</span>}
@@ -35,13 +38,15 @@ const UserEdit = () => {
   
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [biros, setBiros] = useState<Biro[]>([]);
+  const [passwordError, setPasswordError] = useState<string>('');
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: '' });
   
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    role: 'user' as Role, // 2. Strictly typed the role
+    role: 'user' as Role, 
     position: '',
     biro_id: '',
     password: '' 
@@ -57,6 +62,24 @@ const UserEdit = () => {
   }, [feedback.message]);
 
   useEffect(() => {
+    const fetchBiros = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('biro')
+          .select('id, name')
+          .order('name', { ascending: true });
+
+        if (error) throw error;
+        setBiros(data);
+      } catch (error) {
+        console.error("Gagal memuat turun senarai biro:", error);
+      }
+    };
+
+    fetchBiros();
+  }, []);
+
+  useEffect(() => {
     const fetchUser = async () => {
       if (!userId) return;
       setIsLoading(true);
@@ -68,7 +91,6 @@ const UserEdit = () => {
 
         if (error) throw error;
 
-        // 3. Fixed TS2339 & SonarLint: 'data' is the user object itself, there is no nested 'data.user'
         if (data) {
           const userObj = data as ExtendedUser; 
           
@@ -97,12 +119,23 @@ const UserEdit = () => {
 
   const handleSave = async () => {
     setIsSaving(true);
-    setFeedback({ type: null, message: '' });
+    setPasswordError('');
 
     try {
       if (!userId) throw new Error("ID pengguna tidak dijumpai.");
 
-      // 4. Removed 'any' and created a clean Record object for the API payload
+      // Validate password if provided
+      if (formData.password.trim().length > 0) {
+        const passwordValidation = passwordSchema.safeParse(formData.password);
+        if (!passwordValidation.success) {
+          const errorMessage = passwordValidation.error?.errors?.[0]?.message || 'Kata laluan tidak memenuhi keperluan';
+          setPasswordError(errorMessage);
+          setIsSaving(false);
+          return;
+        }
+      }
+
+      // Update user data including email
       const updateData: Record<string, string> = {
         name: formData.name,
         email: formData.email,
@@ -113,12 +146,12 @@ const UserEdit = () => {
 
       const { error: updateError } = await authClient.admin.updateUser({
         userId: userId,
-        data: updateData // Safe payload
+        data: updateData
       });
 
       if (updateError) throw updateError;
 
-      // Update the Role
+      // Update Role
       const { error: roleError } = await authClient.admin.setRole({
         userId: userId,
         role: formData.role
@@ -126,13 +159,14 @@ const UserEdit = () => {
 
       if (roleError) throw roleError;
 
-      // Securely Reset Password (if typed)
+      // Reset Password
       if (formData.password.trim().length > 0) {
-        const { error: passwordError } = await authClient.admin.setUserPassword({
+        const { error: passwordUpdateError } = await authClient.admin.setUserPassword({
           userId: userId,
           newPassword: formData.password
         });
         
+        if (passwordUpdateError) throw passwordUpdate
         if (passwordError) throw passwordError;
       }
 
@@ -142,13 +176,10 @@ const UserEdit = () => {
         setFormData(prev => ({ ...prev, password: '' }));
       }
 
-    } catch (error: unknown) { // 5. Fixed ESLint 'any' in catch block
+    } catch (error: unknown) { 
       console.error("Error updating user:", error);
-      
-      // Type casting the unknown error to extract Better Auth's error message structure
       const err = error as { error?: { message?: string }, message?: string };
       const errorMessage = err?.error?.message || err?.message || "Ralat semasa menyimpan. Sila cuba lagi.";
-      
       setFeedback({ type: 'error', message: errorMessage });
     } finally {
       setIsSaving(false);
@@ -224,14 +255,19 @@ const UserEdit = () => {
             />
           </Field>
 
-          <Field label="Biro ID">
-            <input 
-              type="text" 
+          <Field label="Biro">
+            <select 
               value={formData.biro_id}
               onChange={(e) => setFormData({ ...formData, biro_id: e.target.value })}
               className={inputCls}
-              placeholder="ID Biro"
-            />
+            >
+              <option value="">-- Pilih Biro --</option>
+              {biros.map((biro) => (
+                <option key={biro.id} value={biro.id}>
+                  {biro.name}
+                </option>
+              ))}
+            </select>
           </Field>
         </div>
 
@@ -240,12 +276,22 @@ const UserEdit = () => {
         <Field label="Tetapkan Semula Kata Laluan (Pilihan)">
           <p className="text-xs text-gray-400 mb-2">Biarkan kosong jika anda tidak mahu menukar kata laluan pengguna ini.</p>
           <input 
-            type="text" 
+            type="password" 
             value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            onChange={(e) => {
+              setFormData({ ...formData, password: e.target.value });
+              setPasswordError('');
+            }}
             className={`${inputCls} sm:w-1/2`}
             placeholder="Kata laluan baru..."
           />
+          {passwordError && (
+            <p className="text-xs text-red-500 mt-1">{passwordError}</p>
+          )}
+          <p className="text-xs text-gray-400 mt-2">
+            • Minimal 8 aksara<br />
+            • Sekurang-kurangnya satu aksara khas (!@#$%^&* dll)
+          </p>
         </Field>
 
         {feedback.message && (
