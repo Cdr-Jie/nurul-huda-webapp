@@ -51,10 +51,10 @@ export const auth = betterAuth({
       adminRoles: ["admin", "financeadmin", "superadmin"]
     }),
     passkey({
-      rpID: process.env.NODE_ENV === "production" ? "nurul-huda-webapp-one.vercel.app" : "localhost",
+      rpID: process.env.NODE_ENV === "production" ? "nurul-huda-webapp.vercel.app" : "localhost",
       rpName: "Nurul Huda Masjid",
       origin: process.env.NODE_ENV === "production" 
-          ? "https://nurul-huda-webapp-one.vercel.app" 
+          ? "https://nurul-huda-webapp.vercel.app" 
           : "http://localhost:5173",
     }),
   ],
