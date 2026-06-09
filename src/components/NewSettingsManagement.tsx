@@ -282,7 +282,7 @@ const SettingsManagement = () => {
         setPasskeys(passkeysData || []);
         showToast('Passkey berjaya ditambah.', 'success');
       }
-    } catch {
+    } catch (err) {
       showToast('Ralat ketika menambah passkey.', 'error');
     } finally {
       setPasskeyLoading(false);
@@ -307,7 +307,7 @@ const SettingsManagement = () => {
         showToast('Passkey berjaya dipadam.', 'success');
         setDeletePasskeyModal({ show: false });
       }
-    } catch {
+    } catch (err) {
       showToast('Ralat ketika memadam passkey.', 'error');
     } finally {
       setDeletingPasskeyId(null);
@@ -663,7 +663,7 @@ const SettingsManagement = () => {
                 disabled={deletingPasskeyId !== null}
                 className="flex-1 py-2.5 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 disabled:opacity-60 text-sm"
               >
-                {deletingPasskeyId ? 'Memadamkan...' : 'Padam'}
+                {deletingPasskeyId !== null ? 'Memadamkan...' : 'Padam'}
               </button>
             </div>
           </div>
