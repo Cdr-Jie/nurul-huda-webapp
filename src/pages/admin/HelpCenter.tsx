@@ -73,10 +73,6 @@ const FaqItem = ({ question, answer }: { question: string; answer: string }) => 
 
 const FAQS = [
   {
-    question: 'Bagaimana cara menukar kata laluan saya?',
-    answer: 'Pergi ke Tetapan → Kata Laluan. Masukkan kata laluan semasa anda, kemudian kata laluan baru anda dua kali untuk mengesahkan. Klik "Kemas Kini Kata Laluan".',
-  },
-  {
     question: 'Bagaimana cara menambah acara baru?',
     answer: 'Pergi ke Pengurusan → Acara. Klik butang "Tambah Acara" di bahagian atas kanan. Isi semua maklumat yang diperlukan dan klik "Simpan".',
   },
@@ -94,7 +90,7 @@ const FAQS = [
   },
   {
     question: 'Apa yang perlu dilakukan jika lupa kata laluan?',
-    answer: 'Pada halaman log masuk, klik "Lupa Kata Laluan" dan masukkan alamat e-mel anda. E-mel untuk menetapkan semula kata laluan akan dihantar kepada anda.',
+    answer: 'Contact developer melalui emel "chanzhijie5@gmail.com" atau whatsapp +60185716608 untuk bantuan reset kata laluan.',
   },
 ];
 
