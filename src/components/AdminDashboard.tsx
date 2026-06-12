@@ -7,6 +7,7 @@ import {
   BanknotesIcon,
   // PlayCircleIcon,
   // PhotoIcon,
+  QuestionMarkCircleIcon,
 } from '@heroicons/react/24/outline';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -25,6 +26,7 @@ const MODULES: Module[] = [
   { name: 'Pengurusan Ahli', icon: UsersIcon,                 color: 'bg-emerald-500', link: '/admin/users'         },
   { name: 'Kewangan/Tabung', icon: BanknotesIcon,             color: 'bg-amber-500',   link: '/admin/finance'       },
   { name: 'Aset Masjid',     icon: CubeIcon,              color: 'bg-cyan-500',    link: '/admin/assets' },
+  { name: 'Pusat Bantuan', icon: QuestionMarkCircleIcon, color: 'bg-emerald-500', link: '/admin/bantuan' }
   // { name: 'Video Tutorial',  icon: PlayCircleIcon,            color: 'bg-purple-500',  link: '/admin/announcements' },
   // { name: 'Media & Dokumen', icon: PhotoIcon,                 color: 'bg-rose-500',    link: '/admin/gallery'       },
 ];

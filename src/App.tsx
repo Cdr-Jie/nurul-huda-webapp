@@ -13,6 +13,7 @@ import { useSession, authClient } from './lib/auth-client';
 import UserPage from './pages/UserPage';
 import SettingsPage from './pages/SettingsPage';
 import MasjidHistory from './components/MasjidHistory';
+import HelpCenter from './pages/admin/HelpCenter';
 
 // 1. Define the Impersonation Indicator inside App.tsx
 function ImpersonationIndicator() {
@@ -90,6 +91,7 @@ function App() {
         <Route path="/settings" element={session ? <SettingsPage /> : <Navigate to ="/login" />} />
         <Route path="/login" element={!session ? <LoginPage /> : <Navigate to="/" />} />
         <Route path="/signup" element={!session ? <SignUpPage /> : <Navigate to="/" />} />
+        <Route path="/admin/bantuan" element={<HelpCenter />} />
         <Route path="*" element={<div className="p-4">Page Not Found</div>} />
       </Routes>
     </Router>
