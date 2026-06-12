@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom"; 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -16,6 +16,7 @@ type LoginData = z.infer<typeof loginSchema>;
 
 const LoginCard = () => {
   const [loading, setLoading] = useState(false);
+  const [passkeyLoading, setPasskeyLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -48,6 +49,64 @@ const LoginCard = () => {
     // Success! Navigate to admin
     navigate("/admin");
   };
+
+useEffect(() => {
+  const controller = new AbortController();
+
+  authClient.signIn.passkey(
+    {
+      autoFill: true,
+    },
+    {
+      signal: controller.signal,
+      onSuccess: () => {
+        navigate("/admin");
+      },
+      onError: (ctx) => {
+        // Silently catch the browser's automatic cancellation error 
+        // so it doesn't flash an error message on your screen.
+        if (ctx.error.message?.includes("cancelled") || ctx.error.message?.includes("aborted")) {
+          console.log("Autofill prompt dismissed or aborted cleanly.");
+          return;
+        }
+        setServerError(ctx.error.message || "Passkey autofill failed");
+      }
+    }
+  );
+
+  return () => {
+    controller.abort(); // Cleans up the WebAuthn listener when component unmounts
+  };
+}, [navigate]); // Run exactly once on mount
+
+
+// 2. Cleaned up manual handler
+const handlePasskeyLogin = async () => {
+  setPasskeyLoading(true);
+  setServerError(null);
+  
+  try {
+    // Explicitly pass autoFill: false to ensure it never collides with page load logic
+    const { data, error } = await authClient.signIn.passkey({
+      autoFill: false 
+    });
+
+    if (error) {
+      setServerError(error.message || "Passkey sign in failed");
+      setPasskeyLoading(false);
+      return;
+    }
+
+    if (data) {
+      navigate("/admin");
+    } else {
+      setPasskeyLoading(false);
+    }
+  } catch (err) {
+    setServerError("Failed to sign in with passkey");
+    setPasskeyLoading(false);
+  }
+};
 
   // Social Login Handler (Example using Better Auth for when you're ready)
   // const handleSocialLogin = async (provider: 'google' | 'facebook') => {
@@ -131,6 +190,15 @@ const LoginCard = () => {
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition disabled:opacity-50"
         >
           {loading ? "Sila tunggu..." : "Masuk"}
+        </button>
+
+        <button
+          type="button"
+          onClick={handlePasskeyLogin}
+          disabled={passkeyLoading}
+          className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl transition disabled:opacity-50"
+        >
+          {passkeyLoading ? "Sila tunggu..." : "Masuk dengan Passkey"}
         </button>
 
         {/* Divider */}

@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { admin as adminPlugin } from "better-auth/plugins"
+import { passkey } from "@better-auth/passkey";
 import { Pool } from "pg";
 import { ac, admin, financeadmin, superadmin, user } from "./permissions.js";
 
@@ -48,7 +49,14 @@ export const auth = betterAuth({
       ac,
       roles: { user, admin, financeadmin, superadmin },
       adminRoles: ["admin", "financeadmin", "superadmin"]
-    })
+    }),
+    passkey({
+      rpID: process.env.NODE_ENV === "production" ? "nurul-huda-webapp.vercel.app" : "localhost",
+      rpName: "Nurul Huda Masjid",
+      origin: process.env.NODE_ENV === "production" 
+          ? "https://nurul-huda-webapp.vercel.app" 
+          : "http://localhost:5173",
+    }),
   ],
 
     user: {
