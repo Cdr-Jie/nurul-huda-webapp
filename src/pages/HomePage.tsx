@@ -129,8 +129,8 @@ const HomePage: React.FC = () => {
               <h4 className="font-bold mb-4">Ikuti Kami</h4>
               <ul className="space-y-2 text-gray-400 text-sm">
                 <li><a href="https://www.facebook.com/profile.php?id=61587368138930" className="hover:text-white">Facebook</a></li>
-                {/* <li><a href="#" className="hover:text-white">Instagram</a></li> */}
-                <li><a href="#" className="hover:text-white">WhatsApp</a></li>
+                {/* <li><a href="" className="hover:text-white">Instagram</a></li> */}
+                <li><a href="https://wa.me/+601137138143" className="hover:text-white">WhatsApp</a></li>
               </ul>
             </div>
           </div>
