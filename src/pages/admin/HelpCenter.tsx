@@ -7,9 +7,18 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon,
   ChevronDownIcon,
+  CodeBracketIcon, 
+  PhoneIcon,
 } from '@heroicons/react/24/outline';
 import { supabase } from '../../supabaseClient';
 import { authClient } from '../../lib/auth-client';
+
+// ─── Developer Details ─────────────────────────────────────────────────────────────
+const devConfig = {
+    name: "Chan (Pembangun sistem)",
+    email: "chanzhijie5@gmail.com",
+    phone: "+60 18 571 6608 (WhatsApp)",
+  };
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -213,6 +222,74 @@ const FeedbackTab = ({ onToast }: { onToast: (msg: string, type: 'success' | 'er
     <div className="space-y-6">
       <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-700">
         💡 Maklum balas anda membantu kami menambah baik sistem. Semua maklum balas akan disemak oleh pembangun.
+      </div>
+
+      <div className="max-w-md mx-auto bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+        {/* Card Header Header Banner */}
+        <div className="bg-gradient-to-r from-slate-800 to-slate-900 p-5 text-white flex items-center gap-4">
+          <div className="p-2.5 bg-slate-700/50 rounded-xl border border-slate-600">
+            <CodeBracketIcon className="w-6 h-6 text-cyan-400" />
+          </div>
+          <div>
+            <h3 className="font-bold text-lg leading-tight">Hubungi Pembangun Sistem</h3>
+            <p className="text-xs text-slate-400 mt-0.5">Sokongan teknikal & laporan ralat (bug)</p>
+          </div>
+        </div>
+
+        {/* Card Body */}
+        <div className="p-6 space-y-4">
+          <p className="text-sm text-gray-600 leading-relaxed">
+            Jika anda menghadapi sebarang masalah teknikal, ralat sistem, atau memerlukan bantuan integrasi, sila hubungi pihak pembangun terus di bawah:
+          </p>
+
+          <div className="space-y-3 pt-2">
+            {/* Email Row */}
+            <div className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
+              <EnvelopeIcon className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <span className="block text-xs font-semibold uppercase tracking-wider text-gray-400">E-mel Rasmi</span>
+                <a 
+                  href={`mailto:${devConfig.email}`} 
+                  className="text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline break-all"
+                >
+                  {devConfig.email}
+                </a>
+              </div>
+            </div>
+
+            {/* Phone / Personal Contact Row with clean line-break */}
+            <div className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
+              <PhoneIcon className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <span className="block text-xs font-semibold uppercase tracking-wider text-gray-400">Telefon / WhatsApp</span>
+                <a 
+                  href={`tel:${devConfig.phone.split('(')[0].replace(/\s/g, '')}`} 
+                  className="group text-sm text-gray-800 transition-colors block"
+                >
+                  {/* The Phone number string */}
+                  <span className="block font-mono font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                    {devConfig.phone.split(' (')[0]}
+                  </span>
+                  
+                  {/* The bracketed name string dropped cleanly below */}
+                  {devConfig.phone.includes('(') && (
+                    <span className="block text-xs text-gray-500 font-normal mt-0.5">
+                      ({devConfig.phone.split(' (')[1]}
+                    </span>
+                  )}
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Card Footer Warning Note */}
+        <div className="px-6 py-3.5 bg-slate-50 border-t border-gray-100 flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-xs text-gray-500 font-medium">
+            Waktu Operasi: Isnin - Jumaat (9:00 AM - 5:00 PM)
+          </span>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
