@@ -27,8 +27,8 @@ const locationConfig: LocationConfig = {
   name: 'Masjid Nurul Huda',
   address: 'Jalan Teluk Sepanggar, 88846',
   city: 'Kota Kinabalu, Sabah',
-  phone: '+60 3 1234 5678',
-  email: 'info@masjidkita.com',
+  phone: '+60 11-3713 8143 (Mohd Nurhelmie Talawi)',
+  email: 'mohdnurhelmie.talawi@gmail.com',
   // Replace with your actual Google Maps embed URL
   mapEmbedUrl:
     "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d253906.64680140646!2d115.84327697753909!3d6.0913976976421935!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x323b149c5f972e19%3A0x61a4e8cfd58f23e6!2sMasjid%20Nurul%20Huda%20Kg.%20Gentisan!5e0!3m2!1sen!2smy!4v1778478519129!5m2!1sen!2smy",
@@ -151,9 +151,22 @@ const MasjidLocation: React.FC = () => {
                 <div className="flex flex-col items-center gap-1 text-gray-700">
                   <span className="text-blue-600"><IconPhone /></span>
                   <p className="font-semibold text-sm text-gray-500 uppercase tracking-wide">Telefon</p>
-                  <a href={`tel:${cfg.phone.replace(/\s/g, '')}`} className="text-gray-800 hover:text-blue-600 transition-colors">
-                    {cfg.phone}
-                  </a>
+                  <a 
+                    href={`tel:${cfg.phone.split('(')[0].replace(/\s/g, '')}`} 
+                    className="text-gray-800 hover:text-blue-600 transition-colors block"
+                  >
+                    {/* The Phone Number */}
+                    <span className="block font-medium">
+                      {cfg.phone.split(' (')[0]}
+                    </span>
+                    
+                    {/* The Name (Only renders if a name exists in the brackets) */}
+                    {cfg.phone.includes('(') && (
+                      <span className="block text-xs text-gray-500 font-normal mt-0.5">
+                        ({cfg.phone.split(' (')[1]}
+                      </span>
+                    )}
+                  </a>                
                 </div>
 
                 <div className="flex flex-col items-center gap-1 text-gray-700">
