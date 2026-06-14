@@ -4,7 +4,7 @@ import Banner from '../components/Banner';
 import MasjidLocation from '../components/MasjidLocation';
 import EventsSection from '../components/EventsSection';
 import masjid from '../assets/masjid.jpeg';
-import qr from '../assets/qr.png';
+import qr from '../assets/qr.jpeg';
 
 const HomePage: React.FC = () => {
   return (
@@ -97,15 +97,52 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
-      
-      <div>
-        <img 
-          src={qr} 
-          alt="Masjid QR Code" 
-          className="absolute inset-0 w-full h-full object-cover opacity-60"
-        />
-      </div>
 
+      {/* Donation Poster Section */}
+      <section className="py-12 px-4 bg-gray-50">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-4xl font-bold text-gray-900 mb-4 text-center">Infaq & Sumbangan</h2>
+          <p className="text-center text-gray-600 mb-8 max-w-xl mx-auto">
+            Sumbangan anda membantu kami menanggung kos pengurusan masjid dan memperkasakan program komuniti.
+          </p>
+
+          {/* Main Poster Card Container */}
+          <div className="bg-white p-4 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-8">
+            
+            {/* Poster Image Container */}
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 sm:p-6 rounded-xl border border-blue-100 text-center">
+              <div className="bg-white p-2 rounded-lg inline-block shadow-md max-w-full overflow-hidden">
+                <img 
+                  src={qr} 
+                  alt="Poster Sumbangan Masjid" 
+                  className="w-full max-w-lg h-auto mx-auto rounded-md object-contain"
+                />
+              </div>
+              <p className="text-blue-800 text-xs font-semibold mt-4">
+                💡 Tips: Anda boleh terus imbas kod QR DuitNow yang tertera pada poster di atas.
+              </p>
+            </div>
+
+            {/* Manual Transfer Details Split Layout */}
+            <div className="grid sm:grid-cols-1 gap-4 pt-4 border-t border-gray-100">
+              <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-5 rounded-xl border border-gray-200 flex flex-col justify-center">
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Nama Akaun Bank</h3>
+                <p className="font-bold text-gray-800 text-base sm:text-lg">Masjid Nurul Huda</p>
+              </div>
+
+            </div>
+
+            {/* Hadith Quote at the bottom */}
+            <div className="flex items-center justify-center gap-3 p-4 bg-green-50 rounded-xl border border-green-100 max-w-md mx-auto text-center">
+              <p className="text-xs sm:text-sm text-green-800">
+                "Sedekah itu tidak akan mengurangi harta." — <span className="font-semibold">(HR. Muslim)</span>
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+      
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-8 px-4">
         <div className="max-w-6xl mx-auto">
