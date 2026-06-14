@@ -729,7 +729,7 @@ const assetsWithCounts = await Promise.all(
                     value={form.total_quantity}
                     onChange={e => setForm(f => ({ ...f, total_quantity: parseInt(e.target.value) || 1 }))} />
                 </Field>
-                <Field label="Keadaan Lalai" required>
+                <Field label="Keadaan" required>
                   <select className={inputCls} value={form.default_condition}
                     onChange={e => setForm(f => ({ ...f, default_condition: e.target.value as Condition }))}>
                     <option value="excellent">Sempurna</option>
