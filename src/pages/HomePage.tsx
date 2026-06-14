@@ -4,6 +4,7 @@ import Banner from '../components/Banner';
 import MasjidLocation from '../components/MasjidLocation';
 import EventsSection from '../components/EventsSection';
 import masjid from '../assets/masjid.jpeg';
+import qr from '../assets/qr.png';
 
 const HomePage: React.FC = () => {
   return (
@@ -64,7 +65,6 @@ const HomePage: React.FC = () => {
       {/* Quick Info Section */}
       <MasjidLocation />
 
-
       {/* Services Section */}
       <section className="py-12 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
@@ -97,6 +97,14 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
+      
+      <div>
+        <img 
+          src={qr} 
+          alt="Masjid QR Code" 
+          className="absolute inset-0 w-full h-full object-cover opacity-60"
+        />
+      </div>
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-8 px-4">
